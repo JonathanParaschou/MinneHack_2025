@@ -8,6 +8,7 @@
 - Node
 - Mongo
 - Express
+- Ajax
 
 ### Frontend
 - Using vite for some QOL configurations
