@@ -5,9 +5,16 @@ import react from '@vitejs/plugin-react';
 export default defineConfig({
   plugins: [react()], // React plugin for JSX/TSX support
   server: {
-    port: 3000,           // Set the dev server port (default: 3000)
-    open: true,           // Automatically open the browser when the dev server starts
-    hmr: true,            // Enable Hot Module Replacement (HMR)
+    port: 3000,
+    open: true,
+    hmr: true,
+    proxy: {
+      '/api': {
+        target: 'http://localhost:5000', // Backend URL
+        changeOrigin: true,
+        secure: false,
+      },
+    },
   },
   build: {
     outDir: 'dist',       // Output directory for production build (default: dist)

@@ -1,17 +1,28 @@
-import express, { Request, Response } from 'express';
+import express from "express";
+import mongoose from "mongoose";
+import cors from "cors";
+import dotenv from "dotenv";
+import itemRoutes from "./routes/itemRoutes";
+
+dotenv.config();
+
+console.log(process.env.MONGO_URI);
 
 const app = express();
-const port = 5000;
+const PORT = process.env.PORT || 5000;
 
-// Middleware (optional)
+// Middleware
+app.use(cors());
 app.use(express.json());
 
-// Example route
-app.get('/', (req: Request, res: Response) => {
-  res.send('Hello from the Express backend!');
-});
+// Routes
+app.use("/api/items", itemRoutes);
 
-// Start the server
-app.listen(port, () => {
-  console.log(`Backend server is running at http://localhost:${port}`);
-});
+// MongoDB Connection
+mongoose
+  .connect(process.env.MONGO_URI!)
+  .then(() => {
+    console.log("Connected to MongoDB Atlas");
+    app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+  })
+  .catch((err) => console.error("MongoDB connection error:", err));
