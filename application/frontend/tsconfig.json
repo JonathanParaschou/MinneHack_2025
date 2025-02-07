@@ -1,0 +1,25 @@
+{
+  "compilerOptions": {
+    "target": "ES6",                           // ES6 for frontend
+    "module": "ESNext",                        // Use ES modules (Vite's default)
+    "jsx": "react-jsx",                        // React JSX transformation
+    "strict": true,                             // Enable strict mode
+    "esModuleInterop": true,                   // Ensure compatibility with non-ES modules
+    "moduleResolution": "node",                // Resolve modules like Node.js
+    "resolveJsonModule": true,                 // Allows importing .json files
+    "skipLibCheck": true,                      // Skip type-checking of libraries
+    "forceConsistentCasingInFileNames": true,  // Ensure consistent file name casing
+    "outDir": "./dist",                        // Output folder for build (for production)
+    "baseUrl": ".",                            // Base directory for module resolution
+    "paths": {
+      "@/*": ["src/*"]                         // Enable path aliasing, e.g. "@/components"
+    }
+  },
+  "include": [
+    "src/**/*.ts",
+    "src/**/*.tsx"                             // Include all TypeScript/JSX files
+  ],
+  "exclude": [
+    "node_modules"                             // Exclude node_modules
+  ]
+}
