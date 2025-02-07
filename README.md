@@ -8,8 +8,7 @@
 - Node
 - Mongo
 - Express
-- Ajax
-
+- Fetch
 ### Frontend
 - Using vite for some QOL configurations
 - Frontend can be run via `npm run dev`
