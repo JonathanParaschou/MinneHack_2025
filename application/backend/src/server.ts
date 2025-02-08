@@ -1,27 +1,21 @@
 import express from "express";
-import mongoose from "mongoose";
 import cors from "cors";
 import dotenv from "dotenv";
-import itemRoutes from "./routes/itemRoutes";
+
+// import itemRoutes from "./routes/itemRoutes";
+import submissionRoutes from "./routes/submissionRoutes";
 
 dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 8080;
 
-
 // Middleware
 app.use(cors());
 app.use(express.json());
 
-// Routes
-app.use("/api/items", itemRoutes);
+app.use("/api/submissions", submissionRoutes);
 
-// MongoDB Connection
-mongoose
-  .connect(process.env.MONGO_URI!)
-  .then(() => {
-    console.log("Connected to MongoDB Atlas");
-    app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
-  })
-  .catch((err) => console.error("MongoDB connection error:", err));
+app.listen(PORT, () => {
+  console.log(`Server listening at http://localhost:${PORT}`);
+});
