@@ -1,35 +1,39 @@
 // Import necessary Firebase services
-import { initializeApp } from "firebase/app";
-import { getFirestore, collection, getDocs, addDoc } from "firebase/firestore";
+import { FirebaseApp, initializeApp } from "firebase/app";
+import { getFirestore, collection, getDocs, addDoc, Firestore } from "firebase/firestore";
 import { firebaseConfig } from "./constants/firebaseConstants";
+import { SUBMISSION_COLLECTION } from "./constants/firebaseConstants";
+import { SubmissionInfo } from "models/ISubmissionInfo";
 
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
+export class FirebaseSubmissions {
+    app: FirebaseApp | undefined;
+    db: Firestore;
 
-// Initialize Firestore
-const db = getFirestore(app);
-
-// Fetch data from Firestore
-async function fetchData() {
-    try {
-      const querySnapshot = await getDocs(collection(db, "users"));
-      querySnapshot.forEach((docSnapshot) => {
-        console.log(docSnapshot.id, " => ", docSnapshot.data());
-      });
-    } catch (e) {
-      console.error("Error fetching data: ", e);
+    constructor() {
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        
+        // Initialize Firestore
+        this.db = getFirestore(app);
     }
-  }
-  
-  // Add data to Firestore
-  async function addData() {
-    try {
-      const docRef = await addDoc(collection(db, "users"), {
-        name: "John Doe",
-        age: 30,
-      });
-      console.log("Document written with ID: ", docRef.id);
-    } catch (e) {
-      console.error("Error adding document: ", e);
+
+    async fetchData() {
+        try {
+            const querySnapshot = await getDocs(collection(this.db, SUBMISSION_COLLECTION));
+            querySnapshot.forEach((docSnapshot) => {
+                console.log(docSnapshot.id, " => ", docSnapshot.data());
+            });
+        } catch (e) {
+            console.error("Error fetching data: ", e);
+        }
     }
-  }
+
+    async addData(submissionData: SubmissionInfo) {
+        try {
+            const docRef = await addDoc(collection(this.db, SUBMISSION_COLLECTION), submissionData);
+            console.log("Document written with ID: ", docRef.id);
+        } catch (e) {
+            console.error("Error adding document: ", e);
+        }
+    }
+}

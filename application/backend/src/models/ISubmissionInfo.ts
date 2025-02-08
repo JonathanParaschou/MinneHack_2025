@@ -4,5 +4,4 @@ export interface SubmissionInfo {
     creatorId: string;
     submittedAt: Date;
     comments: any[];
-    votes?: number;
 }
