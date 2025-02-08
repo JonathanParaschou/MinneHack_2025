@@ -1,9 +1,9 @@
 import express from 'express';
-import { FirebaseSubmissions } from '../submissionFirebase';
+import { SubmissionsDataHandler } from '../models/submissionFirebase';
 
 // CRUD operations for submissions
 const router = express.Router();
-const db = new FirebaseSubmissions();
+const db = new SubmissionsDataHandler();
 
 // CREATE
 router.post('/', async (req, res) => {
@@ -11,7 +11,7 @@ router.post('/', async (req, res) => {
         await db.addData(req.body);
         res.status(201).json();
     } catch (err: any) {
-        res.status(400).json({ error: err.message });
+        res.status(500).json({ error: err.message });
     }
 });
 

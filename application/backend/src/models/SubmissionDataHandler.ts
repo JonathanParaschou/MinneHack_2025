@@ -1,11 +1,11 @@
 // Import necessary Firebase services
 import { FirebaseApp, initializeApp } from "firebase/app";
 import { getFirestore, collection, getDocs, addDoc, Firestore } from "firebase/firestore";
-import { firebaseConfig } from "./constants/firebaseConstants";
-import { SUBMISSION_COLLECTION } from "./constants/firebaseConstants";
-import { SubmissionInfo } from "models/ISubmissionInfo";
+import { firebaseConfig } from "../constants/firebaseConstants";
+import { SUBMISSION_COLLECTION } from "../constants/firebaseConstants";
+import { SubmissionInfo } from "interfaces/ISubmissionInfo";
 
-export class FirebaseSubmissions {
+export class SubmissionDataHandler {
     app: FirebaseApp | undefined;
     db: Firestore;
 
@@ -30,10 +30,9 @@ export class FirebaseSubmissions {
 
     async addData(submissionData: SubmissionInfo) {
         try {
-            const docRef = await addDoc(collection(this.db, SUBMISSION_COLLECTION), submissionData);
-            console.log("Document written with ID: ", docRef.id);
+            await addDoc(collection(this.db, SUBMISSION_COLLECTION), submissionData);
         } catch (e) {
-            console.error("Error adding document: ", e);
+            throw new Error("Error adding document: " + e);
         }
     }
 }
