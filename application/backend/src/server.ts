@@ -6,10 +6,9 @@ import itemRoutes from "./routes/itemRoutes";
 
 dotenv.config();
 
-console.log(process.env.MONGO_URI);
-
 const app = express();
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 8080;
+
 
 // Middleware
 app.use(cors());
