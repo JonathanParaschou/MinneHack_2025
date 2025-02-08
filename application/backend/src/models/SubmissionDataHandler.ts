@@ -1,6 +1,6 @@
 // Import necessary Firebase services
 import { FirebaseApp, initializeApp } from "firebase/app";
-import { getFirestore, collection, getDocs, addDoc, Firestore, deleteDoc, doc, updateDoc } from "firebase/firestore";
+import { getFirestore, collection, getDocs, addDoc, Firestore, deleteDoc, doc, updateDoc, DocumentData } from "firebase/firestore";
 import { firebaseConfig } from "../constants/firebaseConstants";
 import { SUBMISSION_COLLECTION } from "../constants/firebaseConstants";
 import { SubmissionInfo } from "interfaces/ISubmissionInfo";
@@ -21,7 +21,7 @@ export class SubmissionDataHandler {
     async fetchData() {
         try {
             const querySnapshot = await getDocs(collection(this.db, SUBMISSION_COLLECTION));
-            querySnapshot.forEach((docSnapshot) => {
+            querySnapshot.forEach((docSnapshot: DocumentData) => {
                 console.log(docSnapshot.id, " => ", docSnapshot.data());
             });
         } catch (e) {
