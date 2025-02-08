@@ -1,9 +1,9 @@
 import express from 'express';
-import { SubmissionsDataHandler } from '../models/submissionFirebase';
+import { SubmissionDataHandler } from '../models/SubmissionDataHandler';
 
 // CRUD operations for submissions
 const router = express.Router();
-const db = new SubmissionsDataHandler();
+const db = new SubmissionDataHandler();
 
 // CREATE
 router.post('/', async (req, res) => {
