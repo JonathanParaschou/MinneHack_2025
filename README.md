@@ -2,7 +2,7 @@
 
 ## Project Structure
 
-### Tech Stack (MERN)
+### Tech Stack (MERN... I know)
 - Typescript
 - React
 - Node
