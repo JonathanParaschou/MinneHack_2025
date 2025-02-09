@@ -4,14 +4,11 @@
 
 ### Tech Stack (MERN... I know)
 - Typescript
-- React
+- React-Native
 - Node
-- Mongo
+- Firebase
 - Express
 - Fetch
-### Frontend
-- Using vite for some QOL configurations
-- Frontend can be run via `npm run dev`
 
 ### Backend
 - `.env` file will house mongo atlas login info - may have to send out via private messaging for privacy protection
