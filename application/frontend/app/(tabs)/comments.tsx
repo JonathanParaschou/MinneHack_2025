@@ -1,11 +1,19 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, TextInput, FlatList } from 'react-native';
-import { useRouter } from 'expo-router';
+import { RouteProp, useNavigation, useRoute, NavigationProp } from '@react-navigation/native';
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
 
-export default function CommentsPage({ submissionId }: { submissionId: string }) {
-  const router = useRouter();
-  const [comments, setComments] = useState<{ comment: string; creatorId: string; createdAt: Date }[]>([]);
+export default function CommentsPage() {
+  type RouteParams = {
+    submissionId: string;
+    comments: string;
+  };
+
+  const route = useRoute<RouteProp<{ params: RouteParams }, 'params'>>(); // Get route parameters passed to the screen
+  const navigation = useNavigation<NavigationProp<any>>();
+  const { submissionId, comments: initialComments } = route.params; // Access the submissionId and comments
+
+  const [commentsList, setCommentsList] = useState<{ comment: string; creatorId: string; createdAt: Date }[]>([]);
   const [newComment, setNewComment] = useState('');
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState<any>(null);
@@ -15,16 +23,20 @@ export default function CommentsPage({ submissionId }: { submissionId: string })
     
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       if (!user) {
-        router.push('/login'); // Redirect to login if not authenticated
+        navigation.navigate('Login'); // Redirect to login if not authenticated
         return;
       }
       setUser(user);
 
       try {
+        // Initialize comments from the passed route params
+        const initialCommentsList = initialComments ? JSON.parse(decodeURIComponent(initialComments)) : [];
+        setCommentsList(initialCommentsList);
+
         // Fetch existing comments for the submission
         const response = await fetch(`http://localhost:8080/api/submissions/${submissionId}/comments`);
         const data = await response.json();
-        setComments(data);
+        setCommentsList((prevComments) => [...prevComments, ...data]); // Append backend comments
       } catch (error) {
         console.error("Error fetching comments:", error);
       } finally {
@@ -33,7 +45,7 @@ export default function CommentsPage({ submissionId }: { submissionId: string })
     });
 
     return () => unsubscribe(); // Cleanup subscription
-  }, [submissionId]);
+  }, [submissionId, initialComments, navigation]);
 
   const handleAddComment = async () => {
     if (newComment.trim() === '') {
@@ -55,7 +67,7 @@ export default function CommentsPage({ submissionId }: { submissionId: string })
 
       if (response.ok) {
         // Add the new comment to the list
-        setComments([...comments, { comment: newComment, creatorId: user.uid, createdAt: new Date() }]);
+        setCommentsList([...commentsList, { comment: newComment, creatorId: user.uid, createdAt: new Date() }]);
         setNewComment(''); // Clear the input field
       } else {
         console.error("Failed to post comment");
@@ -78,7 +90,7 @@ export default function CommentsPage({ submissionId }: { submissionId: string })
       <Text style={styles.title}>Comments</Text>
 
       <FlatList
-        data={comments}
+        data={commentsList}
         keyExtractor={(item, index) => index.toString()}
         renderItem={({ item }) => (
           <View style={styles.commentContainer}>

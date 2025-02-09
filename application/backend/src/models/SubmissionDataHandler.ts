@@ -26,6 +26,9 @@ export class SubmissionDataHandler {
             }
 
             let uids = userData.friends;
+            if(!uids) {
+                uids = [];
+            }
             uids.push(uid);
 
             const docRefPrompt = doc(this.db, PROMPT_COLLECTION, "prompt_master");
@@ -89,11 +92,13 @@ export class SubmissionDataHandler {
     // Add a document into the database
     async addData(submissionData: SubmissionInfo) {
         try {
-            await addDoc(collection(this.db, SUBMISSION_COLLECTION), submissionData);
+            const docRef = await addDoc(collection(this.db, SUBMISSION_COLLECTION), submissionData);
+            submissionData.submissionId = docRef.id;
         } catch (e) {
             throw new Error("Error adding document: " + e);
         }
     }
+    
 
     async updateRating(id: string, stars: string) {
         try {

@@ -7,4 +7,5 @@ export interface SubmissionInfo {
     contestId?: string;
     votes?: number;
     totalVotes?: number;
+    submissionId: string;
 }

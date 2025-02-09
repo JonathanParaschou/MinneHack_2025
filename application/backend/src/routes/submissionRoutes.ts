@@ -9,7 +9,7 @@ const router = express.Router();
 const db = new SubmissionDataHandler();
 
 // Fetching all submission data
-router.get('/', authenticate, async (req, res) => {
+router.get('/',  async (req, res) => {
     try {
         const submissions = await db.fetchData(req.headers["authorization"] as string);
         res.status(200).json(submissions);
@@ -19,8 +19,9 @@ router.get('/', authenticate, async (req, res) => {
 });
 
 // Create a new submission
-router.post('/', authenticate, async (req, res) => {
+router.post('/',  async (req, res) => {
     try {
+        console.log(req.body);
         await db.addData(req.body);
         res.status(201).json();
     } catch (err: any) {
@@ -28,8 +29,8 @@ router.post('/', authenticate, async (req, res) => {
     }
 });
 
-// Update an existing submission
-router.put('/:id', authenticate, async (req, res) => {
+// Add a new comment to a submission
+router.post('/comment/:id',  async (req, res) => {
     try {
         await db.updateData(req.params.id, req.body);
         res.status(200).json();
@@ -53,7 +54,7 @@ router.put('/rating/:id', async (req, res) => {
 });
 
 // Delete an existing Submission
-router.delete('/:id', authenticate, async (req, res) => {
+router.delete('/:id',  async (req, res) => {
     try {
         await db.deleteData(req.params.id);
         res.status(200).json();
@@ -63,7 +64,7 @@ router.delete('/:id', authenticate, async (req, res) => {
 });
 
 // Fetch all submissions based on creator ID
-router.get('/creator/:creatorIds', authenticate, async (req, res) => {
+router.get('/creator/:creatorIds',  async (req, res) => {
     try {
         const submissions = await db.fetchSubmissionDataByCreatorIds([req.params.creatorIds]);
         res.status(200).json(submissions);
@@ -73,7 +74,7 @@ router.get('/creator/:creatorIds', authenticate, async (req, res) => {
 });
 
 // Fetch submission by ID
-router.get('/:id', authenticate, async (req, res) => {
+router.get('/:id',  async (req, res) => {
     try {
         const submission = await db.fetchSubmissionDataById(req.params.id);
         res.status(200).json(submission);
