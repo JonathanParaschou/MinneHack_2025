@@ -39,7 +39,6 @@ export class PromptDataHandler {
             const docSnap = await getDoc(docRef);
             const data = docSnap.data();
 
-            console.log(data);
             if (!data) {
                 throw new Error("Document not found.");
             }

@@ -10,7 +10,6 @@ const db = new PromptDataHandler();
 // Fetching current prompt
 router.get('/', async (req, res) => {
     try {
-        console.log("Fetching prompt");
         const prompt = await db.fetchPrompt();
         res.status(200).json(prompt);
     } catch (err: any) {

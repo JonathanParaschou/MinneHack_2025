@@ -69,20 +69,25 @@ export default function DrawPage() {
 
   // Save the drawing as an image to Firebase Storage
   const handlePost = async () => {
-    const svg = `<svg width="300" height="400">${paths
-      .map(
-        ({ path, color, width }) =>
-          `<path d="${path}" stroke="${color}" stroke-width="${width}" fill="none" />`
-      )
-      .join("")}</svg>`;
-
-    // Convert SVG to Blob (you can adjust this method depending on your library/tools)
+    // Create the SVG string with a white background
+    const svg = `<svg width="300" height="400" xmlns="http://www.w3.org/2000/svg">
+                  <!-- White background rectangle -->
+                  <rect width="100%" height="100%" fill="white" />
+                  ${paths
+                    .map(
+                      ({ path, color, width }) =>
+                        `<path d="${path}" stroke="${color}" stroke-width="${width}" fill="none" />`
+                    )
+                    .join("")}
+                </svg>`;
+  
+    // Convert SVG to Blob
     const svgBlob = new Blob([svg], { type: "image/svg+xml" });
-
+  
     // Upload to Firebase Storage
     const storageRef = ref(storage, `drawings/${Date.now()}.svg`);
     const uploadTask = uploadBytesResumable(storageRef, svgBlob);
-
+  
     uploadTask.on(
       "state_changed",
       (snapshot) => {
@@ -97,7 +102,7 @@ export default function DrawPage() {
         getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
           console.log("Drawing uploaded successfully! URL: ", downloadURL);
           Alert.alert("Upload successful", `Your drawing is available at: ${downloadURL}`);
-
+  
           const submissionObj: any = {
             photoURL: downloadURL,
             prompt: "Draw something",
@@ -105,13 +110,13 @@ export default function DrawPage() {
             submittedAt: new Date(),
             comments: [],
           };
-
-          //add if if applicable
+  
+          // Add contestId if applicable
           if (id) {
             submissionObj.contestId = id;
           }
-
-          // MAKE A POST TO THE NODE API
+  
+          // Make a POST to the Node API
           fetch("http://localhost:8080/api/submissions", {
             method: "POST",
             headers: {
@@ -120,7 +125,6 @@ export default function DrawPage() {
             body: JSON.stringify(submissionObj),
           })
             .then(() => {
-              // response.json();
               fetch("http://localhost:8080/api/prompt/uid", {
                 method: "POST",
                 headers: {
@@ -129,7 +133,7 @@ export default function DrawPage() {
                 body: JSON.stringify({ uid: user?.uid }),
               }).then(() => {
                 router.push('/home');
-              })
+              });
             })
             .catch((error) => {
               console.error("Error:", error);
@@ -138,6 +142,7 @@ export default function DrawPage() {
       }
     );
   };
+  
 
   // Clear canvas (reset all paths)
   const clearCanvas = () => {

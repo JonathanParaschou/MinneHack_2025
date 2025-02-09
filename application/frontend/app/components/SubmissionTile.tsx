@@ -1,8 +1,8 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Dimensions } from 'react-native';
-// import SvgUri from 'react-native-svg-uri'; // This is one option to render SVG
+import { SvgXml } from 'react-native-svg'; // Import SvgXml
 
-const { width } = Dimensions.get('window');
+const { width, height } = Dimensions.get('window');
 
 interface Submission {
   photoURL: string;
@@ -13,14 +13,59 @@ interface Submission {
 
 const SubmissionTile = ({ submission }: { submission: Submission }) => {
   const { photoURL, creatorId, submittedAt, prompt } = submission;
+  const [svgContent, setSvgContent] = useState<string | null>(null); // State to hold the fetched SVG content
+  const [svgWidth, setSvgWidth] = useState<number>(0);
+  const [svgHeight, setSvgHeight] = useState<number>(0);
+
+  useEffect(() => {
+    const fetchSvg = async () => {
+      try {
+        const response = await fetch(photoURL);
+        const svgText = await response.text();
+        setSvgContent(svgText);
+
+        // Extract width and height from the SVG viewBox
+        const match = svgText.match(/viewBox="0 0 (\d+) (\d+)"/);
+        if (match) {
+          const [_, width, height] = match;
+          setSvgWidth(parseInt(width, 10));
+          setSvgHeight(parseInt(height, 10));
+        }
+      } catch (error) {
+        console.error('Error fetching SVG:', error);
+      }
+    };
+
+    if (photoURL) {
+      fetchSvg();
+    }
+  }, [photoURL]);
+
+  // Calculate aspect ratio of the SVG
+  const aspectRatio = svgWidth && svgHeight ? svgWidth / svgHeight : 1;
+
+  // Limit the max height and width
+  const maxWidth = width * 0.9; // Max width to 90% of the screen width
+  const maxHeight = height * 0.5; // Max height to 50% of the screen height
+
+  // Calculate the desired width and height based on the aspect ratio
+  let svgWidthAdjusted = maxWidth;
+  let svgHeightAdjusted = maxWidth / aspectRatio;
+
+  // If the height exceeds the max height, adjust accordingly
+  if (svgHeightAdjusted > maxHeight) {
+    svgHeightAdjusted = maxHeight;
+    svgWidthAdjusted = maxHeight * aspectRatio;
+  }
 
   return (
     <View style={styles.tileContainer}>
-      {/* <SvgUri
-        width="100%" // Full width of the container
-        height={width * 0.5} // Height based on width
-        source={{ uri: photoURL }} // The URL of the SVG
-      /> */}
+      {/* Conditionally render the SVG if it's available */}
+      {svgContent ? (
+        <SvgXml xml={svgContent} width={svgWidthAdjusted} height={svgHeightAdjusted} />
+      ) : (
+        <Text style={styles.timeText}>Loading SVG...</Text>
+      )}
 
       <Text style={styles.timeText}>Posted {submittedAt.toString()}</Text>
 
