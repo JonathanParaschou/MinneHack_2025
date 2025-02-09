@@ -2,7 +2,7 @@
 import { FirebaseApp, initializeApp } from "firebase/app";
 import { getFirestore, collection, getDocs, addDoc, Firestore, deleteDoc, doc, updateDoc, DocumentData, query, where, getDoc } from "firebase/firestore";
 import { firebaseConfig } from "../constants/firebaseConstants";
-import { SUBMISSION_COLLECTION, AUTHENTICATION_COLLECTION } from "../constants/firebaseConstants";
+import { SUBMISSION_COLLECTION, AUTHENTICATION_COLLECTION, PROMPT_COLLECTION } from "../constants/firebaseConstants";
 import { SubmissionInfo } from "interfaces/ISubmissionInfo";
 
 export class SubmissionDataHandler {
@@ -27,9 +27,18 @@ export class SubmissionDataHandler {
 
             let uids = userData.friends;
             uids.push(uid);
+
+            const docRefPrompt = doc(this.db, PROMPT_COLLECTION, "prompt_master");
+            const docSnapPrompt = await getDoc(docRefPrompt);
+            const promptData = docSnapPrompt.data();
+            if(!promptData) {
+                throw new Error("Document not found.");
+            }
+
+            let prompt = promptData.prompt;
             
             let ret: SubmissionInfo[] = [];
-            const q = query(collection(this.db, SUBMISSION_COLLECTION), where("creatorId", "in", uids));
+            const q = query(collection(this.db, SUBMISSION_COLLECTION), where("creatorId", "in", uids), where("prompt", "==", prompt));
             const querySnapshot = await getDocs(q);
 
             querySnapshot.forEach((docSnapshot) => {
