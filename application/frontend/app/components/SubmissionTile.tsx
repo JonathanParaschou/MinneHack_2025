@@ -1,7 +1,9 @@
-import { router } from 'expo-router';
 import React, { useEffect, useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Dimensions } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, Dimensions, Image } from 'react-native';
 import { SvgXml } from 'react-native-svg'; // Import SvgXml
+import { fetchWithUid } from '../utils/fetch';
+import { ensureAuth, user } from '../utils/firebase';
+import { useRouter } from 'expo-router';
 
 const { width, height } = Dimensions.get('window');
 
@@ -17,6 +19,16 @@ const SubmissionTile = ({ submission }: { submission: Submission }) => {
   const [svgContent, setSvgContent] = useState<string | null>(null); // State to hold the fetched SVG content
   const [svgWidth, setSvgWidth] = useState<number>(0);
   const [svgHeight, setSvgHeight] = useState<number>(0);
+  const [userData, setUserData] = useState<any>({photoURL: '', dispName: ''});
+
+  const router = useRouter();
+
+  function makePostedString(date: Date) {
+    date = new Date(date);
+    const options: any = { weekday: 'long', month: 'long', day: 'numeric' };
+    return date.toLocaleDateString(undefined, options) + ' at ' + date.toLocaleTimeString();
+    return "";
+  }
 
   useEffect(() => {
     const fetchSvg = async () => {
@@ -32,6 +44,12 @@ const SubmissionTile = ({ submission }: { submission: Submission }) => {
           setSvgWidth(parseInt(width, 10));
           setSvgHeight(parseInt(height, 10));
         }
+
+        await ensureAuth();
+        const userResponse = await fetchWithUid(`http://localhost:8080/api/users/${creatorId}`, {}, (user as any).uid);
+        const userData = (await userResponse.json())[0];
+        console.log(userData);
+        setUserData(userData);
       } catch (error) {
         console.error('Error fetching SVG:', error);
       }
@@ -61,6 +79,16 @@ const SubmissionTile = ({ submission }: { submission: Submission }) => {
 
   return (
     <View style={styles.tileContainer}>
+      <View style={styles.tileHeader}>
+        <Image
+            source={{uri: userData.photoURL}} 
+            style={{width: 40, height: 40, borderRadius: 20}}
+            onClick={() => router.push('/user?id=' + userData.uid)}
+          />
+          <Text style={styles.username}>
+            {userData.dispName}
+          </Text>
+      </View>
       {/* Conditionally render the SVG if it's available */}
       {svgContent ? (
         <SvgXml xml={svgContent} width={svgWidthAdjusted} height={svgHeightAdjusted} />
@@ -68,10 +96,10 @@ const SubmissionTile = ({ submission }: { submission: Submission }) => {
         <Text style={styles.timeText}>Loading SVG...</Text>
       )}
 
-      <Text style={styles.timeText}>Posted {submittedAt.toString()}</Text>
+      <Text style={styles.timeText}>{makePostedString(submittedAt)}</Text>
 
       <View style={styles.actions}>
-        <TouchableOpacity style={styles.button} onPress={() => router.push('../comments')}>
+        <TouchableOpacity style={styles.button}>
           <Text style={styles.buttonText}>Comment</Text>
         </TouchableOpacity>
       </View>
@@ -80,6 +108,17 @@ const SubmissionTile = ({ submission }: { submission: Submission }) => {
 };
 
 const styles = StyleSheet.create({
+  username: {
+    color: '#FFF',
+    fontWeight: 'bold',
+    marginBottom: 10,
+    fontSize: 20
+  },
+  tileHeader: {
+    flexDirection: 'row',
+    marginBottom: 10,
+    gap: 10
+  },
   tileContainer: {
     backgroundColor: '#1f1f1f',
     borderRadius: 10,
@@ -95,6 +134,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#777',
     marginBottom: 10,
+    marginTop: 5
   },
   actions: {
     flexDirection: 'row',

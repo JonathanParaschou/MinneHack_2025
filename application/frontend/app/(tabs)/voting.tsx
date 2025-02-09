@@ -42,7 +42,7 @@ const VotingScreen = () => {
       console.log(data);
     }
     load();
-  })
+  });
 
   return (
     <View style={styles.container}>
