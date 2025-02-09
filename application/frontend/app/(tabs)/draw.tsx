@@ -1,10 +1,13 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { View, Button, StyleSheet, Text, Alert, TouchableOpacity } from "react-native";
 import Svg, { Path } from "react-native-svg";
 import Slider from "@react-native-community/slider";
 import { getStorage, ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import { initializeApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
+import { fetchWithUid } from "../utils/fetch";
+import { useRouter, useLocalSearchParams } from "expo-router";
+import { ensureAuth, user } from "../utils/firebase";
 
 // Firebase configuration
 const firebaseConfig = {
@@ -26,6 +29,8 @@ export default function DrawPage() {
   const [currentPath, setCurrentPath] = useState<string>(""); // Path being drawn
   const [strokeColor, setStrokeColor] = useState<string>("#FF0000"); // Default color (Red)
   const [strokeWidth, setStrokeWidth] = useState<number>(5); // Default brush size
+  const [timeLeft, setTimeLeft] = useState<string>("");
+  const { id } = useLocalSearchParams();
 
   const colorOptions = [
     "#FF0000", // Red
@@ -93,13 +98,18 @@ export default function DrawPage() {
           console.log("Drawing uploaded successfully! URL: ", downloadURL);
           Alert.alert("Upload successful", `Your drawing is available at: ${downloadURL}`);
 
-          const submissionObj = {
+          const submissionObj: any = {
             photoURL: downloadURL,
             prompt: "Draw something",
             creatorId: "TestUser",
             submittedAt: new Date(),
-            comments: []
+            comments: [],
           };
+
+          //add if if applicable
+          if (id) {
+            submissionObj.contestId = id;
+          }
 
           // MAKE A POST TO THE NODE API
           fetch("http://localhost:8080/api/submissions", {
@@ -112,6 +122,7 @@ export default function DrawPage() {
             .then((response) => response.json())
             .then((data) => {
               console.log("Success:", data);
+              router.push('/home');
             })
             .catch((error) => {
               console.error("Error:", error);
@@ -131,8 +142,89 @@ export default function DrawPage() {
     setPaths(paths.slice(0, -1));
   };
 
+  function secondsToMinutes(seconds: number) {
+    const minutes = Math.floor(seconds / 60);
+    const remainingSeconds = seconds % 60;
+    return `${minutes}:${remainingSeconds < 10 ? "0" : ""}${remainingSeconds.toFixed(0)}`;
+  }
+
+  const router = useRouter();
+  useEffect(() => {
+    async function load() { 
+        await ensureAuth();
+        if (!user) {
+            router.push('/login');
+            return;
+        }
+
+        if (!id) {
+          //do other stuff here
+          return;
+        }
+
+        //fetch contest stuff
+        const response = await fetchWithUid('http://localhost:8080/api/contests', {}, user.uid);
+        const respData = await response.json();
+        const startTime = new Date(respData.time.seconds * 1000);
+        respData.time = startTime;
+
+        const votingTime = new Date(startTime.getTime() + 500 * 60000);
+        const contestEndTime = new Date(startTime.getTime() + 15 * 60000);
+
+        let currentTime = new Date();
+
+        //contest has not started
+        if (currentTime < startTime) {
+            router.push('/home');
+            return;
+        }
+        else if (currentTime < votingTime) { //contest is in progress, let them continue
+          console.log(secondsToMinutes((votingTime.getTime() - currentTime.getTime()) / 1000))
+          setTimeLeft(secondsToMinutes((votingTime.getTime() - currentTime.getTime()) / 1000));
+        }
+        else if (currentTime < contestEndTime) { //voting has started
+            router.push('/voting');
+            return;
+        }
+        else { //contest has ended
+            router.push('/home');
+            return;
+        }
+
+        // //check time and update accordingly
+        const interval = setInterval(() => {
+            let currentTime = new Date();
+
+            //contest has not started
+            if (currentTime < startTime) {
+                router.push('/home');
+                clearInterval(interval);
+            }
+            else if (currentTime < votingTime) { //contest is in progress
+              setTimeLeft(secondsToMinutes((votingTime.getTime() - currentTime.getTime()) / 1000));
+            }
+            else if (currentTime < contestEndTime) { //voting has started
+                if (((currentTime as any) - (votingTime as any)) > 2000) {
+                  handlePost();
+                }
+                router.push('/voting');
+                clearInterval(interval);
+            }
+            else { //contest has ended
+                router.push('/home');
+                clearInterval(interval);
+            }
+        }, 1000);
+
+        //clear interval on un-mount
+        return () => clearInterval(interval);
+    }
+    load();
+  }, []);
+
   return (
     <View style={styles.container}>
+      <Text style={styles.timeLeftText}>Time left: {timeLeft}</Text>
       {/* Color Picker (Circles) */}
       <View style={styles.colorPickerContainer}>
         {colorOptions.map((color, index) => (
@@ -202,6 +294,13 @@ export default function DrawPage() {
 }
 
 const styles = StyleSheet.create({
+  timeLeftText: {
+    color: "#ffffff",
+    textAlign: "center",
+    fontSize: 20,
+    marginTop: 10,
+    marginBottom: 10
+  },
   container: {
     flex: 1,
     justifyContent: "center",
@@ -236,11 +335,11 @@ const styles = StyleSheet.create({
     flexWrap: "wrap",
     justifyContent: "center",
     marginBottom: 20,
-    width: "80%",
+    width: "98%",
   },
   colorCircle: {
-    width: 40,
-    height: 40,
+    width: 35,
+    height: 35,
     borderRadius: 20,
     margin: 5,
   },
