@@ -1,5 +1,5 @@
 import { ScrollView, Text, View, TouchableOpacity, StyleSheet, Dimensions, Image, TextInput } from "react-native";
-import { useRouter } from 'expo-router';
+import { useLocalSearchParams, useRouter } from 'expo-router';
 import Footer from "../components/Footer";
 import Podium from "../components/Podium";
 import Header from "../components/header";
@@ -14,6 +14,8 @@ export default function User() {
     const [editingUsername, setEditingUsername] = useState(false);
     const [photoURL, setPhotoURL] = useState('');
     const [userData, setUser] = useState({} as any);
+    const [owner, setOwner] = useState(false);
+    let { id } = useLocalSearchParams();
 
     const router = useRouter();
 
@@ -48,16 +50,24 @@ export default function User() {
                 return;
             }
 
-            const resp = await fetchWithUid(`http://localhost:8080/api/users/${user.uid}`, {}, user.uid);
-            const data = await resp.json();
+            if (!id) {
+              id = (user as any).uid;
+            }
+
+            const resp = await fetchWithUid(`http://localhost:8080/api/users/${id}`, {}, user.uid);
+            const data = (await resp.json())[0];
+
+            if (data.uid === (user as any).uid) {
+                setOwner(true);
+            }
 
             setUser(data);
-            console.log(data.dispName);
+            console.log(data);
             setUsername(data.dispName || ''); // Ensure a fallback for username
-            setPhotoURL((user as any).photoURL);
+            setPhotoURL((data as any).photoURL);
         }
         load();
-    }, []);
+    }, [id]);
 
   return (
     <View style={styles.container}>
@@ -81,9 +91,11 @@ export default function User() {
                 /> :
                 <Text style={styles.username}>{username}</Text>
             }
+            {owner ?
             <TouchableOpacity onPress={handleUsernameChange}>
                 <Text style={styles.editButton}>{editingUsername ? "Save Username" : "Edit Username"}</Text>
-            </TouchableOpacity>
+            </TouchableOpacity> : null
+            }
         </View>
 
         <Podium players={players} />

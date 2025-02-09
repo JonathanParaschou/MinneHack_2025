@@ -58,6 +58,7 @@ export default function Index() {
     return (
       <View style={styles.blockedContainer}>
         <Text style={styles.blockedText}>You must draw today's prompt to unlock your feed!</Text>
+        <Text style={[styles.blockedText, {fontWeight: 'bold'}]}>{(prompt as any).prompt}</Text>
         <TouchableOpacity style={styles.drawButton} onPress={() => router.push('/(tabs)/draw')}>
           <Text style={styles.drawButtonText}>Draw Now</Text>
         </TouchableOpacity>
@@ -105,9 +106,10 @@ const styles = StyleSheet.create({
     color: 'white',
     textAlign: 'center',
     marginBottom: 20,
+    width: '90%',
   },
   drawButton: {
-    backgroundColor: '#FF4500',
+    backgroundColor: 'rgba(200, 200, 200, 0.5)',
     paddingVertical: 12,
     paddingHorizontal: 20,
     borderRadius: 8,

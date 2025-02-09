@@ -90,7 +90,8 @@ const FriendsListPage = () => {
                 {incomingRequests.length > 0 ? (
                     incomingRequests.map((request: any) => (
                         <View key={request} style={styles.user}>
-                            <Image source={{ uri: request.photoURL }} style={{ width: 50, height: 50, borderRadius: 50 }} />
+                            <Image source={{ uri: request.photoURL }} style={{ width: 50, height: 50, borderRadius: 50 }} 
+                            onClick={() => router.push(`/user?id=${request.uid}`)}/>
                             <Text style={styles.userText}>{request.dispName}</Text>
                             <TouchableOpacity onPress={() => handleRequestAction(request.uid, 'accept')}>
                                 <Text style={styles.buttonText}>Accept</Text>
@@ -108,7 +109,9 @@ const FriendsListPage = () => {
                 {friends.length > 0 ? (
                     friends.map((friend: any) => (
                         <View key={friend.id || friend.uid} style={styles.user}>
-                            <Image source={{ uri: friend.photoURL }} style={{ width: 50, height: 50, borderRadius: 50 }} />
+                            <Image source={{ uri: friend.photoURL }} style={{ width: 50, height: 50, borderRadius: 50 }} 
+                            onClick={() => router.push(`/user?id=${friend.uid}`)}
+                            />
                             <Text style={styles.userText}>{friend.dispName}</Text>
                             <View style={{ flex: 1 }}>
                                 <TouchableOpacity onPress={() => removeFriend(friend.uid)}>

@@ -80,7 +80,9 @@ const FriendsComponent = () => {
         {users.length > 0 ? (
           users.map((user: any) => (
             <View key={user.id || user.uid} style={styles.user}>
-              <Image source={{ uri: user.photoURL }} style={{ width: 50, height: 50, borderRadius: 50 }} />
+              <Image source={{ uri: user.photoURL }} style={{ width: 50, height: 50, borderRadius: 50 }}
+                onClick={() => router.push(`/user?id=${user.uid}`)}
+              />
               <Text style={styles.userText}>{user.dispName}</Text>
               <TouchableOpacity onPress={() => handleAddFriend(user.uid)}>
                 <Text style={styles.buttonText}>Add Friend</Text>

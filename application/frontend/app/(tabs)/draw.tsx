@@ -30,6 +30,7 @@ export default function DrawPage() {
   const [strokeColor, setStrokeColor] = useState<string>("#FF0000"); // Default color (Red)
   const [strokeWidth, setStrokeWidth] = useState<number>(5); // Default brush size
   const [timeLeft, setTimeLeft] = useState<string>("");
+  const [prompt, setPrompt] = useState<string>("");
   const { id } = useLocalSearchParams();
 
   const colorOptions = [
@@ -168,8 +169,12 @@ export default function DrawPage() {
 
         //case of no contest, user is drawing prompt
         if (!id) {
+          const response = await fetchWithUid('http://localhost:8080/api/prompt', {}, user.uid);
+          const promptData = await response.json();
+          setPrompt(promptData.prompt);
+
           let startTime = new Date();
-          let endTime = new Date(startTime.getTime() + 2 * 60000);
+          let endTime = new Date(startTime.getTime() + 5 * 60000);
           setTimeLeft(secondsToMinutes((endTime.getTime() - startTime.getTime()) / 1000));
 
           interval = setInterval(() => {
@@ -200,7 +205,7 @@ export default function DrawPage() {
         const startTime = new Date(respData.time.seconds * 1000);
         respData.time = startTime;
 
-      const votingTime = new Date(startTime.getTime() + 500 * 60000);
+      const votingTime = new Date(startTime.getTime() + 5 * 60000);
       const contestEndTime = new Date(startTime.getTime() + 15 * 60000);
 
       let currentTime = new Date();
@@ -256,6 +261,7 @@ export default function DrawPage() {
 
   return (
     <View style={styles.container}>
+      <Text style={[styles.timeLeftText, {marginBottom: -10, fontWeight: 'bold'}]}>{prompt}</Text>
       <Text style={styles.timeLeftText}>Time left: {timeLeft}</Text>
       {/* Color Picker (Circles) */}
       <View style={styles.colorPickerContainer}>
@@ -353,9 +359,11 @@ const styles = StyleSheet.create({
   sliderContainer: {
     marginBottom: 20,
     width: "80%",
+    marginTop: -10
   },
   slider: {
     width: "100%",
+    marginTop: -6,
   },
   text: {
     color: "white",
