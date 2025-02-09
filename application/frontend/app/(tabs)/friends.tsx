@@ -8,14 +8,41 @@ import Footer from '../components/Footer';
 
 const { width, height } = Dimensions.get("window");
 
-
 const FriendsComponent = () => {
-  const [users, setUsers] = useState([]);
+  const [users, setUsers] = useState([]);  // Filtered list
+  const [allUsers, setAllUsers] = useState([]); // Full list
   const [search, setSearch] = useState('');
   const router = useRouter();
 
-  function handleAddFriend(uid: string) {
-    console.log(uid);
+  // handle the add friend button
+  function handleAddFriend(otherId: string) {
+    const params = {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ user: (user as any).uid, other: otherId }),
+    }
+    fetchWithUid('http://localhost:8080/api/friends/sendRequest', params, (user as any).uid);
+
+    // Update the list of users
+    const updatedUsers = users.filter((u: any) => u.uid !== otherId);
+    setUsers(updatedUsers);
+  }
+
+  function handleSearch(text: string) {
+    setSearch(text); // Update state with the search text
+    if (!text.trim()) {
+      setUsers(allUsers); // Reset to original list when search is cleared
+      return;
+    }
+
+    const filteredUsers = allUsers.filter((user: any) =>
+      user.dispName.toLowerCase().includes(text.toLowerCase()) ||
+      user.email.toLowerCase().includes(text.toLowerCase())
+    );
+
+    setUsers(filteredUsers);
   }
 
   useEffect(() => {
@@ -23,9 +50,11 @@ const FriendsComponent = () => {
       await ensureAuth();
       if (user) {
         const res = await fetchWithUid('http://localhost:8080/api/users', {}, user.uid);
-        const data = await res.json();
+        let data = await res.json();
+        data = data.filter((u: any) => !(u.friendRequests.includes((user as any).uid) || u.friends.includes((user as any).uid)));
+
         setUsers(data);
-        console.log(data);
+        setAllUsers(data); // Store full list of users
       } else {
         router.push('/login');
       }
@@ -38,17 +67,16 @@ const FriendsComponent = () => {
       <Header />
       <View style={{marginTop: 80}}></View>
       <View>
-        <Text style={styles.pageTitle}>
-          Search for Friends
-        </Text>
+        <Text style={styles.pageTitle}>Search for Friends</Text>
       </View>
       <TextInput
-          style={styles.input}
-          value={search}  // Bind state value to TextInput
-          onChangeText={setSearch}  // Update state on text change
-          placeholder="Search username or email"  // Placeholder text
-          placeholderTextColor="rgba(255, 255, 255, 0.5)"
+        style={styles.input}
+        value={search}
+        onChangeText={handleSearch} // Properly handle text input
+        placeholder="Search username or email"
+        placeholderTextColor="rgba(255, 255, 255, 0.5)"
       />
+      <Text style={{fontSize: 10, color: 'white', marginTop: 3}}>Friends and friend requests will not show up here</Text>
       <ScrollView style={styles.scrollContainer} contentContainerStyle={styles.container}>
         {users.length > 0 ? (
           users.map((user: any) => (
@@ -56,12 +84,12 @@ const FriendsComponent = () => {
               <Image source={{ uri: user.photoURL }} style={{ width: 50, height: 50, borderRadius: 50 }} />
               <Text style={styles.userText}>{user.dispName}</Text>
               <TouchableOpacity onPress={() => handleAddFriend(user.uid)}>
-                  <Text style={styles.buttonText}>Add Friend</Text>
+                <Text style={styles.buttonText}>Add Friend</Text>
               </TouchableOpacity>
             </View>
           ))
         ) : (
-          <Text style={styles.userText}>No users found</Text>
+          <Text style={styles.userText}>No users found!</Text>
         )}
       </ScrollView>
       <Footer />
@@ -71,16 +99,16 @@ const FriendsComponent = () => {
 
 const styles = StyleSheet.create({
   page: {
-    flex: 1, // Ensures the entire page takes full screen height
+    flex: 1,
     backgroundColor: 'black',
     alignItems: 'center',
   },
   scrollContainer: {
-    flex: 1, // Makes the ScrollView take up the remaining space
+    flex: 1,
     width: width,
   },
   container: {
-    flexGrow: 1, // Ensures content expands inside ScrollView
+    flexGrow: 1,
     alignItems: 'center',
     paddingVertical: 20,
   },
@@ -108,7 +136,6 @@ const styles = StyleSheet.create({
     fontSize: 24,
     textAlign: 'center',
     marginBottom: 20,
-    // fontWeight: 'bold',
   },
   input: {
     height: 40,
@@ -127,7 +154,5 @@ const styles = StyleSheet.create({
     borderRadius: 5,
   }
 });
-
-
 
 export default FriendsComponent;

@@ -13,7 +13,7 @@ export default function Index() {
   useEffect(() => {
     const fetchSubmissions = async () => {
       try {
-        const response = await fetch('http://localhost:5000/api/submissions'); // Replace with actual API URL
+        const response = await fetch('http://localhost:8080/api/submissions'); // Replace with actual API URL
         const data = await response.json();
         setSubmissions(data); // Set the fetched data to the state
       } catch (error) {

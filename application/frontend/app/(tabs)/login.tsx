@@ -9,6 +9,7 @@ interface UserInfo {
     uid: string;
     dispName:string;
     photoURL: string;
+    friendRequests: string[];
 }
 
 export default function Index() {
@@ -25,7 +26,8 @@ export default function Index() {
                 email: (user as any).email,
                 uid: (user as any).uid,
                 dispName: (user as any).displayName,
-                photoURL: (user as any).photoURL
+                photoURL: (user as any).photoURL,
+                friendRequests: []
             }
 
             fetch('http://localhost:8080/api/users', {

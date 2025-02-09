@@ -102,7 +102,7 @@ export default function DrawPage() {
           };
 
           // MAKE A POST TO THE NODE API
-          fetch("http://localhost:5000/api/submissions", {
+          fetch("http://localhost:8080/api/submissions", {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
