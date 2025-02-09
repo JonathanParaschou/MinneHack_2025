@@ -8,14 +8,14 @@ const SubmissionTile = () => {
     <View style={styles.tileContainer}>
       <View style={styles.header}>
         <Image 
-          source={require('../images/user.png')} // Replace with a local or remote image
+          source={{ uri: 'https://raw.githubusercontent.com/PeterOlsen1/coderunner/refs/heads/main/static/favicon.ico' }} // Replace with a local or remote image
           style={styles.avatar}
         />
         <Text style={styles.userName}>John Doe</Text>
       </View>
 
       <Image
-        source={require('../images/user.png')} // Replace with a local or remote image
+        source={{ uri: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSYVx6CB56pxO8gwlzLLOkV8fPN0jfF3T_98w&s' }} // Replace with a local or remote image
         style={styles.postImage}
       />
 

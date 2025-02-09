@@ -1,4 +1,4 @@
-import { Text, View, Image, Dimensions } from "react-native";
+import { ScrollView, Text, View, Image, Dimensions } from "react-native";
 import { StyleSheet } from "react-native";
 import SubmissionTile from "../components/SubmissionTile";
 
@@ -6,7 +6,7 @@ const { width, height } = Dimensions.get('window');
 
 export default function Index() {
   return (
-    <View style={styles.container}>
+    <ScrollView style={styles.container}>
       <View style={styles.header}>
         <Image
           source={require('../images/user-friends.svg')}
@@ -21,7 +21,8 @@ export default function Index() {
       </View>
 
       <SubmissionTile />
-    </View>
+      <SubmissionTile />
+    </ScrollView>
   );
 }
 
