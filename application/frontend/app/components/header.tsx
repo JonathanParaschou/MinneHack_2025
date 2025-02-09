@@ -5,9 +5,9 @@ import { ensureAuth, user } from '../utils/firebase';
 
 const { width, height } = Dimensions.get("window");
 
-const Header = () => {
+const Header = ({ friends } : { friends?: boolean }) => {
   const router = useRouter();
-
+  
   const [photoURL, setPhotoURL] = useState('');
 
   useEffect(() => {
@@ -20,11 +20,24 @@ const Header = () => {
 
   return (
     <View style={styles.header}>
-      <TouchableOpacity onPress={() => router.push('/friends')}>
-        <Text style={styles.text}>Friends</Text>
-      </TouchableOpacity>
+      {friends ? 
+        <TouchableOpacity onPress={() => router.push('/friendslist')}>
+          <Text style={styles.text}>Friends List</Text>
+        </TouchableOpacity>
+      :
+        <TouchableOpacity onPress={() => router.push('/friends')}>
+          <Text style={styles.text}>Friends</Text>
+        </TouchableOpacity>
+      }
       <TouchableOpacity style={{ flex: 1 }} onPress={() => router.push('/home')}>
-        <Text style={styles.title}>DrawIt.</Text>
+        <View style={styles.titleContainer}>
+            <Text style={styles.textSegment}>Draw</Text>
+            <Image
+                source={{uri: 'https://static.vecteezy.com/system/resources/previews/048/690/582/non_2x/a-brush-isolated-on-transparent-background-free-png.png'}} 
+                style={{width: 40, height: 40, marginRight: -15, marginLeft: -15}}
+            />
+            <Text style={styles.textSegment}>t.</Text>
+        </View>
       </TouchableOpacity>
       <TouchableOpacity onPress={() => router.push('/user')}>
         <Image
@@ -39,6 +52,16 @@ const Header = () => {
 };
 
 const styles = StyleSheet.create({
+  titleContainer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center'
+  },
+  textSegment: {
+    fontSize: 30,
+    textAlign: 'center',
+    color: 'white',
+  },
   header: {
     flexDirection: "row",
     alignItems: "center",
@@ -46,7 +69,7 @@ const styles = StyleSheet.create({
     borderBottomColor: "#444", // Lighter border color
     borderBottomWidth: 1,
     backgroundColor: "#1f1f1f", // Dark background for the header
-    paddingVertical: 10,
+    paddingVertical: 5,
     paddingHorizontal: 15,
     position: "absolute",
     top: 0,

@@ -13,6 +13,23 @@ const FriendsListPage = () => {
     const [incomingRequests, setIncomingRequests] = useState([]);  // New state for incoming requests
     const router = useRouter();
 
+    function removeFriend(friendId: string) {
+        fetchWithUid(`http://localhost:8080/api/friends/removeFriend`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                user: (user as any).uid,
+                other: friendId,
+            }),
+        }, (user as any).uid);
+    
+        // Update the list of friends
+        const updatedFriends = friends.filter((f: any) => f.uid !== friendId);
+        setFriends(updatedFriends);
+    }
+
     // Function to load the data
     const load = async () => {
         await ensureAuth();
@@ -65,7 +82,7 @@ const FriendsListPage = () => {
         <View style={styles.page}>
             <Header />
             <View style={styles.headerContainer}>
-                <Text style={styles.pageTitle}>Your Friends</Text>
+                <Text style={styles.pageTitle}></Text>
             </View>
 
             <ScrollView style={styles.scrollContainer} contentContainerStyle={styles.container}>
@@ -86,13 +103,18 @@ const FriendsListPage = () => {
                 ) : (
                     <Text style={styles.userText}>No incoming requests</Text>
                 )}
-
+                <View style={{marginTop: 30}}></View>
                 <Text style={styles.subTitle}>Your Friends</Text>
                 {friends.length > 0 ? (
                     friends.map((friend: any) => (
                         <View key={friend.id || friend.uid} style={styles.user}>
                             <Image source={{ uri: friend.photoURL }} style={{ width: 50, height: 50, borderRadius: 50 }} />
                             <Text style={styles.userText}>{friend.dispName}</Text>
+                            <View style={{ flex: 1 }}>
+                                <TouchableOpacity onPress={() => removeFriend(friend.uid)}>
+                                    <Text style={styles.buttonText}>Remove</Text>
+                                </TouchableOpacity>
+                            </View>
                         </View>
                     ))
                 ) : (
@@ -113,7 +135,7 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between', // Ensures footer stays at the bottom
     },
     headerContainer: {
-        marginTop: 80,
+        marginTop: 30,
         alignItems: 'center',
         marginBottom: 20,
     },
@@ -126,6 +148,7 @@ const styles = StyleSheet.create({
         color: 'white',
         fontSize: 20,
         marginVertical: 10,
+        fontWeight: 'bold',
     },
     scrollContainer: {
         flex: 1,
@@ -153,13 +176,14 @@ const styles = StyleSheet.create({
         color: 'white',
         fontSize: 18,
         textAlign: 'left',
-        flex: 1,
+        // flex: 1,
     },
     buttonText: {
         color: 'white',
         backgroundColor: 'rgba(255, 255, 255, 0.2)',
         padding: 5,
         borderRadius: 5,
+        marginLeft: 'auto'
     },
 });
 

@@ -64,12 +64,9 @@ const FriendsComponent = () => {
   
   return (
     <View style={styles.page}>
-      <Header />
-      <View style={{ marginTop: 80, flexDirection: 'row', justifyContent: 'space-between', width: width * 0.9 }}>
+      <Header friends={true}/>
+      <View style={{ marginTop: 80, flexDirection: 'row', justifyContent: 'center', width: width * 1 }}>
         <Text style={styles.pageTitle}>Search for Friends</Text>
-        <TouchableOpacity onPress={() => router.push('/friendslist')}>
-          <Text style={styles.friendsListText}>Friends List</Text>
-        </TouchableOpacity>
       </View>
       <TextInput
         style={styles.input}

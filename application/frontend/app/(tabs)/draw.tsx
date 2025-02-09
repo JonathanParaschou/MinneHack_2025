@@ -101,7 +101,7 @@ export default function DrawPage() {
           const submissionObj: any = {
             photoURL: downloadURL,
             prompt: "Draw something",
-            creatorId: "TestUser",
+            creatorId: (user as any).uid || "anonymous",
             submittedAt: new Date(),
             comments: [],
           };
@@ -150,6 +150,8 @@ export default function DrawPage() {
 
   const router = useRouter();
   useEffect(() => {
+    let interval: any = null;
+
     async function load() { 
         await ensureAuth();
         if (!user) {
@@ -157,14 +159,37 @@ export default function DrawPage() {
             return;
         }
 
+        //case of no contest, user is drawing prompt
         if (!id) {
-          //do other stuff here
+          let startTime = new Date();
+          let endTime = new Date(startTime.getTime() + 2 * 60000);
+          setTimeLeft(secondsToMinutes((endTime.getTime() - startTime.getTime()) / 1000));
+
+          interval = setInterval(() => {
+            let currentTime = new Date();
+            if (currentTime > endTime) {
+              handlePost();
+              router.push('/home');
+              clearInterval(interval);
+              return;
+            }
+            else {
+              setTimeLeft(secondsToMinutes((endTime.getTime() - currentTime.getTime()) / 1000));
+            }
+          }, 1000);
           return;
         }
 
         //fetch contest stuff
         const response = await fetchWithUid('http://localhost:8080/api/contests', {}, user.uid);
         const respData = await response.json();
+        console.log(respData);
+        
+        //they requested the wrong contest or a nonexistent one
+        if (id != respData.contestId) {
+            router.push('/home');
+            return;
+        }
         const startTime = new Date(respData.time.seconds * 1000);
         respData.time = startTime;
 
@@ -192,7 +217,7 @@ export default function DrawPage() {
         }
 
         // //check time and update accordingly
-        const interval = setInterval(() => {
+        interval = setInterval(() => {
             let currentTime = new Date();
 
             //contest has not started

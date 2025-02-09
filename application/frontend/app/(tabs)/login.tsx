@@ -1,5 +1,5 @@
 import React from 'react';
-import { TouchableOpacity, View, Text, Image } from 'react-native';
+import { TouchableOpacity, View, Text, Image, StyleSheet } from 'react-native';
 import { signInWithGoogle, user } from "../utils/firebase";
 import styles from "../style/google-button";
 
@@ -44,12 +44,23 @@ export default function Index() {
     };
 
     return (
-        <View>
+        <View style={loginStyles.container}>
+            <View>
+                <View style={loginStyles.titleContainer}>
+                    <Text style={loginStyles.title}>Draw</Text>
+                    <Image
+                        source={{uri: 'https://static.vecteezy.com/system/resources/previews/048/690/582/non_2x/a-brush-isolated-on-transparent-background-free-png.png'}} 
+                        style={{width: 50, height: 50, marginRight: -15, marginLeft: -15}}
+                    />
+                    <Text style={loginStyles.title}>t.</Text>
+                </View>
+                <Text style={loginStyles.subtitle}>Show off daily drawings to your friends and compete in weekly competitions</Text>
+            </View>
             <TouchableOpacity style={styles.materialButton} onPress={handlePress}>
                 <View style={styles.materialButtonContentWrapper}>
                     <View style={styles.materialButtonIcon}>
                         <Image 
-                            source={{uri: 'https://upload.wikimedia.org/wikipedia/commons/4/43/Google_2015_logo.svg'}} 
+                            source={{uri: 'https://logos-world.net/wp-content/uploads/2020/09/Google-Symbol.png'}} 
                             style={{width: 20, height: 20}} 
                         />
                     </View>
@@ -60,3 +71,36 @@ export default function Index() {
         </View>
     );
 }
+
+const loginStyles = StyleSheet.create({
+    titleContainer: {
+        flexDirection: 'row',
+        justifyContent: 'center',
+        alignItems: 'center'
+    },
+    container: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: "#1f1f1f",
+        alignContent: 'center',
+        textAlign: 'center',
+    },
+    subtitle: {
+        fontSize: 15,
+        textAlign: 'center',
+        color: 'white',
+        marginBottom: 50,
+        width: '85%',
+        marginLeft: 'auto',
+        marginRight: 'auto',
+        marginTop: -40
+    },
+    title: {
+        fontSize: 50,
+        textAlign: 'center',
+        marginTop: 50,
+        marginBottom: 50,
+        color: 'white',
+    }
+});

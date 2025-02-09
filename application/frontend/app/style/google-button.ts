@@ -17,7 +17,9 @@ const styles = StyleSheet.create({
     position: 'relative',
     textAlign: 'center',
     verticalAlign: 'middle',
-    maxWidth: 400,
+    // maxWidth: 400,
+    marginRight: 'auto',
+    marginLeft: 'auto',
   },
   materialButtonIcon: {
     height: 20,
