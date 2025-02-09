@@ -15,13 +15,18 @@ export class PromptDataHandler {
     }
 
     // Fetches all submission data from the database
+
     async fetchPrompt() {
         try {
-            const docRef = await doc(collection(this.db, PROMPT_COLLECTION));
+            const docRef = doc(this.db, PROMPT_COLLECTION, "prompt_master");
             const docSnap = await getDoc(docRef);
-            const data = docSnap.data();
 
-            return data;
+            if (docSnap.exists()) {
+                return docSnap.data();
+            } else {
+                console.log("No such document!");
+                return null;
+            }
         } catch (e) {
             console.error("Error fetching data: ", e);
         }
@@ -29,10 +34,11 @@ export class PromptDataHandler {
 
     async addUID(uid: string) {
         try {
-            const docRef = await doc(collection(this.db, PROMPT_COLLECTION));
+            const docRef = doc(this.db, PROMPT_COLLECTION, "prompt_master");
             const docSnap = await getDoc(docRef);
             const data = docSnap.data();
 
+            console.log(data);
             if (!data) {
                 throw new Error("Document not found.");
             }

@@ -1,55 +1,78 @@
 import { ScrollView, Text, View, TouchableOpacity, StyleSheet } from "react-native";
-import { useState, useEffect } from "react"; // Import useState and useEffect
+import { useState, useEffect } from "react";
 import { useRouter } from 'expo-router';
 import Footer from "../components/Footer";
 import Header from "../components/header";
 import SubmissionTile from "../components/SubmissionTile";
+import { getAuth, onAuthStateChanged } from "firebase/auth";
 
 export default function Index() {
   const router = useRouter();
-  const [submissions, setSubmissions] = useState([]); // State to hold fetched submission data
-  const [prompt, setPrompt] = useState(""); // State to hold fetched prompt data
+  const [submissions, setSubmissions] = useState([]);
+  const [prompt, setPrompt] = useState<{ prompt: string; uids: string[] } | null>(null);
+  const [userHasDrawn, setUserHasDrawn] = useState(false);
+  const [loading, setLoading] = useState(true);
 
-  // Fetch data on component mount
   useEffect(() => {
-    const fetchSubmissions = async () => {
-      try {
-        const response = await fetch('http://localhost:8080/api/submissions'); // Replace with actual API URL
-        const data = await response.json();
-        setSubmissions(data); // Set the fetched data to the state
-      } catch (error) {
-        console.error("Error fetching submissions:", error);
+    const auth = getAuth();
+    
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+      if (!user) {
+        router.push('/login'); // Redirect to login if not authenticated
+        return;
       }
-    };
 
-    const fetchPrompt = async () => {
       try {
-        const response = await fetch('http://localhost:8080/api/prompt');
-        const data = await response.json();
-        setPrompt(data.prompt); // Set the fetched data to the state
-      } catch (error) {
-        console.error("Error fetching prompt:", error);
-      }
-    };
+        // Fetch prompt
+        const promptResponse = await fetch('http://localhost:8080/api/prompt');
+        const promptData = await promptResponse.json();
+        setPrompt(promptData);
 
-    fetchSubmissions();
-    fetchPrompt();
-  }, []); // Empty dependency array to run only once after component mounts
+        // Check if the user has drawn
+        setUserHasDrawn(promptData.uids.includes(user.uid));
+
+        // Fetch submissions
+        const submissionsResponse = await fetch('http://localhost:8080/api/submissions');
+        const submissionsData = await submissionsResponse.json();
+        console.log(submissionsData);
+        setSubmissions(submissionsData);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      } finally {
+        setLoading(false);
+      }
+    });
+
+    return () => unsubscribe(); // Cleanup subscription
+  }, []);
+
+  if (loading) {
+    return (
+      <View style={styles.loadingContainer}>
+        <Text style={styles.loadingText}>Loading...</Text>
+      </View>
+    );
+  }
+
+  if (!userHasDrawn) {
+    return (
+      <View style={styles.blockedContainer}>
+        <Text style={styles.blockedText}>You must draw today's prompt to unlock your feed!</Text>
+        <TouchableOpacity style={styles.drawButton} onPress={() => router.push('/(tabs)/draw')}>
+          <Text style={styles.drawButtonText}>Draw Now</Text>
+        </TouchableOpacity>
+      </View>
+    );
+  }
 
   return (
     <View style={styles.container}>
       <Header />
-
-
       <ScrollView contentContainerStyle={styles.scrollContent}>
-        {/* <TouchableOpacity style={styles.button} onPress={() => router.push('/(tabs)/draw')}>
-          <Text style={styles.buttonText}>Post</Text>
-        </TouchableOpacity> */}
-      <Text style={styles.title}>{prompt}</Text>
-
+        <Text style={styles.title}>{prompt?.prompt}</Text>
         {submissions.length > 0 ? (
           submissions.map((submission, index) => (
-            <SubmissionTile key={index} submission={submission} /> // Pass each submission as a prop
+            <SubmissionTile key={index} submission={submission} />
           ))
         ) : (
           <Text style={styles.noDataText}>No submissions available</Text>
@@ -63,37 +86,56 @@ export default function Index() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#121212", // Dark background for the whole screen
+    backgroundColor: "#121212",
   },
   scrollContent: {
-    paddingTop: 60, // Ensure content starts below the fixed header
+    paddingTop: 60,
     paddingBottom: 20,
-    alignItems: 'center', // Center the submission tiles horizontally
-    justifyContent: 'center', // Center the submission tiles vertically
+    alignItems: 'center',
+    justifyContent: 'center',
   },
-  button: {
-    backgroundColor: '#FFF',
-    paddingVertical: 8,
-    paddingHorizontal: 15,
-    borderRadius: 5,
+  blockedContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: "#121212",
   },
-  buttonText: {
-    color: '#GGG',
+  blockedText: {
+    fontSize: 20,
+    color: 'white',
+    textAlign: 'center',
+    marginBottom: 20,
+  },
+  drawButton: {
+    backgroundColor: '#FF4500',
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    borderRadius: 8,
+  },
+  drawButtonText: {
+    color: 'white',
+    fontSize: 16,
     fontWeight: 'bold',
-  },
-  text: {
-    color: 'white'
   },
   title: {
     fontSize: 30,
     fontWeight: "bold",
-    flex: 1,
     textAlign: "center",
-    color: "#ffffff", // White text for dark mode
+    color: "#ffffff",
   },
   noDataText: {
     color: 'white',
     textAlign: 'center',
     marginTop: 20,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: "#121212",
+  },
+  loadingText: {
+    fontSize: 18,
+    color: 'white',
   },
 });
