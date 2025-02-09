@@ -2,12 +2,13 @@ import { ScrollView, Text, View, TouchableOpacity, StyleSheet } from "react-nati
 import { useState, useEffect } from "react"; // Import useState and useEffect
 import { useRouter } from 'expo-router';
 import Footer from "../components/Footer";
-import Header from "../components/Header";
+import Header from "../components/header";
 import SubmissionTile from "../components/SubmissionTile";
 
 export default function Index() {
   const router = useRouter();
   const [submissions, setSubmissions] = useState([]); // State to hold fetched submission data
+  const [prompt, setPrompt] = useState(""); // State to hold fetched prompt data
 
   // Fetch data on component mount
   useEffect(() => {
@@ -21,17 +22,30 @@ export default function Index() {
       }
     };
 
+    const fetchPrompt = async () => {
+      try {
+        const response = await fetch('http://localhost:8080/api/prompt');
+        const data = await response.json();
+        setPrompt(data.prompt); // Set the fetched data to the state
+      } catch (error) {
+        console.error("Error fetching prompt:", error);
+      }
+    };
+
     fetchSubmissions();
+    fetchPrompt();
   }, []); // Empty dependency array to run only once after component mounts
 
   return (
     <View style={styles.container}>
-      <Header />
+      {/* <Header /> */}
+
 
       <ScrollView contentContainerStyle={styles.scrollContent}>
-        <TouchableOpacity style={styles.button} onPress={() => router.push('/(tabs)/draw')}>
+        {/* <TouchableOpacity style={styles.button} onPress={() => router.push('/(tabs)/draw')}>
           <Text style={styles.buttonText}>Post</Text>
-        </TouchableOpacity>
+        </TouchableOpacity> */}
+      <Text style={styles.title}>{prompt}</Text>
 
         {submissions.length > 0 ? (
           submissions.map((submission, index) => (
@@ -54,6 +68,8 @@ const styles = StyleSheet.create({
   scrollContent: {
     paddingTop: 60, // Ensure content starts below the fixed header
     paddingBottom: 20,
+    alignItems: 'center', // Center the submission tiles horizontally
+    justifyContent: 'center', // Center the submission tiles vertically
   },
   button: {
     backgroundColor: '#FFF',

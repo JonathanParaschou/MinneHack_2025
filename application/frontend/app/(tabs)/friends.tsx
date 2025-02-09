@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, Dimensions, TextInput, Image, TouchableOpacity } from 'react-native';
-import Header from '../components/Header';
+import Header from '../components/header';
 import { fetchWithUid } from '../utils/fetch';
 import { useRouter } from 'expo-router';
 import { auth, ensureAuth, user } from '../utils/firebase';
@@ -49,7 +49,7 @@ const FriendsComponent = () => {
     async function load() {
       await ensureAuth();
       if (user) {
-        const res = await fetchWithUid('http://localhost:8080/api/users', {}, user.uid);
+        const res = await fetchWithUid('http://localhost:8080/api/users/nonfriends', {}, user.uid);
         let data = await res.json();
         data = data.filter((u: any) => !(u.friendRequests.includes((user as any).uid) || u.friends.includes((user as any).uid)));
 
@@ -65,9 +65,11 @@ const FriendsComponent = () => {
   return (
     <View style={styles.page}>
       <Header />
-      <View style={{marginTop: 80}}></View>
-      <View>
+      <View style={{ marginTop: 80, flexDirection: 'row', justifyContent: 'space-between', width: width * 0.9 }}>
         <Text style={styles.pageTitle}>Search for Friends</Text>
+        <TouchableOpacity onPress={() => router.push('/friendslist')}>
+          <Text style={styles.friendsListText}>Friends List</Text>
+        </TouchableOpacity>
       </View>
       <TextInput
         style={styles.input}
@@ -152,7 +154,14 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(255, 255, 255, 0.2)',
     padding: 5,
     borderRadius: 5,
-  }
+  },
+  friendsListText: {
+    color: 'white',
+    fontSize: 18,
+    padding: 10,
+    borderRadius: 5,
+    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+  },
 });
 
 export default FriendsComponent;

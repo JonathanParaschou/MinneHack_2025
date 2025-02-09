@@ -10,3 +10,4 @@ export const firebaseConfig = {
 
 export const AUTHENTICATION_COLLECTION = "users";
 export const SUBMISSION_COLLECTION = "submissions";
+export const PROMPT_COLLECTION = "prompt";

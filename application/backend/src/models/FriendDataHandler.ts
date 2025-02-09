@@ -42,11 +42,9 @@ export class FriendDataHandler {
                 throw new Error("Document not found.");
             }
             const friends = data.friends || [];
-            friends.push(friendId);
-            const friendRequests = data.friendRequests || [];
-            const index = friendRequests.indexOf(uid);
-            friendRequests.splice(index, 1);
-            await updateDoc(docRef, { friends: friends, friendRequests: friendRequests });
+            friends.push(uid);
+            
+            await updateDoc(docRef, { friends: friends });
 
             const docRef2 = doc(this.db, AUTHENTICATION_COLLECTION, uid);
             const docSnap2 = await getDoc(docRef2);
@@ -54,9 +52,14 @@ export class FriendDataHandler {
             if (!data2) {
                 throw new Error("Document not found.");
             }
+
+            const friendRequests = data2.friendRequests || [];
+            const index = friendRequests.indexOf(friendId);
+            friendRequests.splice(index, 1);
+
             const friends2 = data2.friends || [];
             friends2.push(friendId);
-            await updateDoc(docRef2, { friends: friends2 });
+            await updateDoc(docRef2, { friends: friends2, friendRequests: friendRequests });
         } catch (e) {
             console.error("Error accepting request: ", e);
         }

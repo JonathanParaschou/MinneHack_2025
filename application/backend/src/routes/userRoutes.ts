@@ -9,10 +9,19 @@ import { authenticate } from '../authMiddleware';
 const router = express.Router();
 const db = new UserDataHandler();
 
-// Fetching all submission data
-router.get('/', authenticate, async (req, res) => {
+// Fetching all submission data other than user
+// router.get('/', async (req, res) => {
+//     try {
+//         const users = await db.fetchAllNonUserData(req.headers['authorization'] as string);
+//         res.status(200).json(users);
+//     } catch (err: any) {
+//         res.status(500).json({ error: err.message });
+//     }
+// });
+
+router.get('/nonfriends', authenticate, async (req, res) => {
     try {
-        const users = await db.fetchAllData();
+        const users = await db.fetchAllNonUserFriendsData(req.headers['authorization'] as string);
         res.status(200).json(users);
     } catch (err: any) {
         res.status(500).json({ error: err.message });
@@ -20,14 +29,34 @@ router.get('/', authenticate, async (req, res) => {
 });
 
 // Fetching all submission data
-router.get('/:id', authenticate, async (req, res) => {
+router.get('/user', authenticate, async (req, res) => {
     try {
-        const user = await db.fetchData(req.params.id);
+        const user = await db.fetchUserDataByUID(req.headers['authorization'] as string);
         res.status(200).json(user);
     } catch (err: any) {
         res.status(500).json({ error: err.message });
     }
 });
+
+router.get('/friends', authenticate, async (req, res) => {
+    try {
+        const friends = await db.fetchUserFriendsData(req.headers['authorization'] as string);
+        res.status(200).json(friends);
+    } catch (err: any) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+// Fetching all user data from a list of ids
+router.get('/:ids', authenticate, async (req, res) => {
+    try {
+        const users = await db.fetchUserDataByCreatorIds(req.params.ids.split(','));
+        res.status(200).json(users);
+    } catch (err: any) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
 
 // Create a new submission
 router.post('/', async (req, res) => {

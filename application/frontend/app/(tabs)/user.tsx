@@ -2,7 +2,7 @@ import { ScrollView, Text, View, TouchableOpacity, StyleSheet, Dimensions, Image
 import { useRouter } from 'expo-router';
 import Footer from "../components/Footer";
 import Podium from "../components/Podium";
-import Header from "../components/Header";
+import Header from "../components/header";
 import React, { useState, useEffect } from 'react';
 import { ensureAuth, user } from "../utils/firebase";
 import { fetchWithUid } from "../utils/fetch";

@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Dimensions } from 'react-native';
-import SvgUri from 'react-native-svg'; // This is one option to render SVG
+import SvgUri from 'react-native-svg-uri'; // This is one option to render SVG
 
 const { width } = Dimensions.get('window');
 
@@ -12,18 +12,15 @@ interface Submission {
 }
 
 const SubmissionTile = ({ submission }: { submission: Submission }) => {
-  // Destructure the properties from the submission prop
-  console.log(submission);
-  
   const { photoURL, creatorId, submittedAt, prompt } = submission;
+
   return (
     <View style={styles.tileContainer}>
-      {/* Render the post image if it's an SVG */}
-      {/* <SvgUri
+      <SvgUri
         width="100%" // Full width of the container
-        height={width * 0.5} // Same height as before
-        uri={photoURL}  // The URL of the SVG image
-      /> */}
+        height={width * 0.5} // Height based on width
+        source={{ uri: photoURL }} // The URL of the SVG
+      />
 
       <Text style={styles.timeText}>Posted {submittedAt.toString()}</Text>
 
@@ -47,27 +44,6 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.2,
     shadowRadius: 4,
     elevation: 5,
-  },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  avatar: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
-    marginRight: 10,
-  },
-  userName: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#FFF',
-  },
-  postImage: {
-    width: '100%',
-    height: width * 0.5,
-    borderRadius: 10,
-    marginVertical: 15,
   },
   timeText: {
     fontSize: 14,
