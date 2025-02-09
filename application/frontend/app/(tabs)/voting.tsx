@@ -17,7 +17,8 @@ const VotingScreen = () => {
   const [contestData, setContestData] = useState([]);
   const router = useRouter();
 
-  const handleVote = (rating: any, id: any) => {
+  const handleVote = (rating: any) => {
+    const id = (contestData[index] as any).submissionId;
     fetchWithUid(`http://localhost:8080/api/submissions/rating/${id}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
@@ -65,17 +66,16 @@ const VotingScreen = () => {
       const response = await fetchWithUid('http://localhost:8080/api/submissions/', {}, (user as any).uid);
       const data = await response.json();
       console.log(data);
-      
+
       setContestData(data);
 
 
       const contestResponse = await fetch('http://localhost:8080/api/contests');
       const contestDataTemp = await contestResponse.json();
 
+      fetchSvg();
       //use this later
       // const contestSubmissions = data.filter((submission: any) => (submission.contestId && submission.contestId === contestData.id));
-
-      fetchNewImage();
     }
     load();
   }, []);

@@ -101,7 +101,7 @@ const SubmissionTile = ({ submission }: { submission: Submission }) => {
 
       <View style={styles.actions}>
         <TouchableOpacity style={styles.button} 
-        onPress={() => router.push('/comments?submissionId=' + (submission.id || ''))}>
+        onPress={() => router.push('/comments?submissionId=' + (submission.submissionId || ''))}>
           <Text style={styles.buttonText}>Comment</Text>
         </TouchableOpacity>
       </View>
