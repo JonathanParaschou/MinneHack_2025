@@ -21,10 +21,10 @@ const styles = StyleSheet.create({
   footer: {
     backgroundColor: '#1f1f1f',
     flexDirection: 'row',
-    justifyContent: 'space-between',
+    justifyContent: 'space-evenly',
     padding: 10,
-    position: 'fixed',
-    bottom: 0,
+    // position: 'fixed',
+    // bottom: 0,
     width: '100%',
   },
   button: {

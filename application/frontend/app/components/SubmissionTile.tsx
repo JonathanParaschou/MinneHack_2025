@@ -23,7 +23,7 @@ const SubmissionTile = () => {
 
       <View style={styles.actions}>
         <TouchableOpacity style={styles.button}>
-          <Text style={styles.buttonText}>Like</Text>
+          <Text style={styles.buttonText}>Comment</Text>
         </TouchableOpacity>
       </View>
     </View>
@@ -55,7 +55,7 @@ const styles = StyleSheet.create({
   userName: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#333',
+    color: '#FFF',
   },
   postImage: {
     width: '100%',
@@ -73,13 +73,13 @@ const styles = StyleSheet.create({
     justifyContent: 'space-around',
   },
   button: {
-    backgroundColor: '#007bff',
+    backgroundColor: '#FFF',
     paddingVertical: 8,
     paddingHorizontal: 15,
     borderRadius: 5,
   },
   buttonText: {
-    color: '#fff',
+    color: '#000',
     fontWeight: 'bold',
   },
 });
