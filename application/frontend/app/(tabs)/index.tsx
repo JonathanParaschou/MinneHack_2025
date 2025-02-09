@@ -1,28 +1,32 @@
 import { ScrollView, Text, View, Image, Dimensions } from "react-native";
 import { StyleSheet } from "react-native";
 import SubmissionTile from "../components/SubmissionTile";
+import Footer from "../components/Footer";
 
 const { width, height } = Dimensions.get('window');
 
 export default function Index() {
   return (
-    <ScrollView style={styles.container}>
+    <View>
       <View style={styles.header}>
-        <Image
-          source={require('../images/user-friends.svg')}
-          style={styles.friends}
-        />
+        <Text style={styles.friends}>
+          Friends
+        </Text>
         <Text style={styles.title}>
           DrawIt.
         </Text>
-        <Text>
-          User photo
+        <Text style={styles.user}>
+          Profile
         </Text>
       </View>
 
-      <SubmissionTile />
-      <SubmissionTile />
-    </ScrollView>
+      {/* <ScrollView style={styles.container}>
+        <SubmissionTile />
+        <SubmissionTile />
+        <SubmissionTile />
+      </ScrollView> */}
+      <Footer/>
+    </View>
   );
 }
 
@@ -43,13 +47,10 @@ const styles = StyleSheet.create({
     paddingHorizontal: 15,
   },
   friends: {
-    width: width * 0.08,
-    height: width * 0.08,
+    color: '#ffffff',
   },
   user: {
-    height: width * 0.06,
-    width: width * 0.06,
-    borderRadius: 15,
+    color: '#ffffff',
   },
   title: {
     fontSize: 30,

@@ -23,9 +23,6 @@ const SubmissionTile = () => {
 
       <View style={styles.actions}>
         <TouchableOpacity style={styles.button}>
-          <Text style={styles.buttonText}>Post</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.button}>
           <Text style={styles.buttonText}>Like</Text>
         </TouchableOpacity>
       </View>

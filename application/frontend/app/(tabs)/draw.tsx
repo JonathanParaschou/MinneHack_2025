@@ -6,19 +6,13 @@ import {
   Text,
 } from 'react-native';
 
-// import { SketchCanvas } from '@terrylinla/react-native-sketch-canvas';
+import { SketchCanvas } from '@terrylinla/react-native-sketch-canvas';
 
 export default function DrawPage() {
     return (
-        // <View style={{ flex: 1, flexDirection: 'row' }}>
-        //     <SketchCanvas
-        //     style={{ flex: 1 }}
-        //     strokeColor={'red'}
-        //     strokeWidth={7}
-        //     />
-        // </View>
-        <div>
-            hi
-        </div>
+        // <SketchCanvas>
+
+        // </SketchCanvas>
+        0
     );
 }
