@@ -12,9 +12,13 @@ export default function Index() {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.text}>Friends</Text>
+        <TouchableOpacity onPress={() => router.push('/friends')}>
+          <Text style={styles.text}>Friends</Text>
+        </TouchableOpacity>
         <Text style={styles.title}>DrawIt.</Text>
-        <Text style={styles.text}>User photo</Text>
+        <TouchableOpacity onPress={() => router.push('/user')}>
+          <Text style={styles.text}>Profile</Text>
+        </TouchableOpacity>
       </View>
 
       <ScrollView contentContainerStyle={styles.scrollContent}>
