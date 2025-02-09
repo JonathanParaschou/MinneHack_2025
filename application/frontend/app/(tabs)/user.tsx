@@ -77,6 +77,7 @@ export default function User() {
                     value={username}  // Bind state value to TextInput
                     onChangeText={setUsername}  // Update state on text change
                     placeholder="Enter new username"  // Placeholder text
+                    placeholderTextColor="rgba(255, 255, 255, 0.5)"
                 /> :
                 <Text style={styles.username}>{username}</Text>
             }
