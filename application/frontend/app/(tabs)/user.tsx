@@ -5,17 +5,18 @@ import Podium from "../components/Podium";
 import Header from "../components/Header";
 import React, { useState, useEffect } from 'react';
 import { ensureAuth, user } from "../utils/firebase";
+import { fetchWithUid } from "../utils/fetch";
 
 const { width, height } = Dimensions.get("window");
 
 export default function User() {
-    const [username, setUsername] = useState('USERNAME HERE');
+    const [username, setUsername] = useState(''); 
     const [editingUsername, setEditingUsername] = useState(false);
     const [photoURL, setPhotoURL] = useState('');
+    const [userData, setUser] = useState({} as any);
 
     const router = useRouter();
 
-    // put thier previous wins here?
     const players = [
         { name: '1', image: '' },
         { name: '3', image: '' },
@@ -24,7 +25,16 @@ export default function User() {
 
     function handleUsernameChange() {
         if (editingUsername) {
-            // backend request
+            userData.dispName = username;
+            const config = {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ ...userData })
+            }
+
+            fetchWithUid(`http://localhost:8080/api/users/${(userData as any).uid}`, config, (user as any).uid);
         }
 
         setEditingUsername(!editingUsername);
@@ -38,6 +48,12 @@ export default function User() {
                 return;
             }
 
+            const resp = await fetchWithUid(`http://localhost:8080/api/users/${user.uid}`, {}, user.uid);
+            const data = await resp.json();
+
+            setUser(data);
+            console.log(data.dispName);
+            setUsername(data.dispName || ''); // Ensure a fallback for username
             setPhotoURL((user as any).photoURL);
         }
         load();
@@ -45,7 +61,7 @@ export default function User() {
 
   return (
     <View style={styles.container}>
-      <Header></Header>
+      <Header />
 
       <ScrollView style={styles.scrollView}>
         <View style={styles.userTop}>
@@ -60,7 +76,7 @@ export default function User() {
                     style={styles.input}
                     value={username}  // Bind state value to TextInput
                     onChangeText={setUsername}  // Update state on text change
-                    placeholder="Enter some text"  // Placeholder text
+                    placeholder="Enter new username"  // Placeholder text
                 /> :
                 <Text style={styles.username}>{username}</Text>
             }
@@ -82,20 +98,6 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#121212",
   },
-  header: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    borderBottomColor: "#444",
-    borderBottomWidth: 1,
-    backgroundColor: "#1f1f1f",
-    paddingVertical: 10,
-    paddingHorizontal: 15,
-    position: "absolute",
-    top: 0,
-    width: "100%",
-    zIndex: 10,
-  },
   input: {
     height: 40,
     borderColor: 'white',
@@ -105,10 +107,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     marginTop: 10,
     color: 'white',
-
   },
   scrollView: {
-    width: '100%'
+    width: '100%',
   },
   userTop: {
     width: width,
@@ -120,7 +121,7 @@ const styles = StyleSheet.create({
   avatar: {
     borderRadius: 999,
     width: height * 0.25,
-    height: height * 0.25
+    height: height * 0.25,
   },
   username: {
     color: 'white',
