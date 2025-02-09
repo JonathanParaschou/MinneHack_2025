@@ -2,7 +2,7 @@
 import { FirebaseApp, initializeApp } from "firebase/app";
 import { getFirestore, collection, getDocs, addDoc, Firestore, deleteDoc, doc, updateDoc, DocumentData, query, where, getDoc } from "firebase/firestore";
 import { firebaseConfig } from "../constants/firebaseConstants";
-import { SUBMISSION_COLLECTION } from "../constants/firebaseConstants";
+import { SUBMISSION_COLLECTION, AUTHENTICATION_COLLECTION } from "../constants/firebaseConstants";
 import { SubmissionInfo } from "interfaces/ISubmissionInfo";
 
 export class SubmissionDataHandler {
@@ -16,13 +16,25 @@ export class SubmissionDataHandler {
     }
 
     // Fetches all submission data from the database
-    async fetchData() {
+    async fetchData(uid: string) {
         try {
-            const querySnapshot = await getDocs(collection(this.db, SUBMISSION_COLLECTION));
-            let ret: SubmissionInfo[] = [];
+            const docRef = doc(this.db, AUTHENTICATION_COLLECTION, uid);
+            const docSnap = await getDoc(docRef);
+            const userData = docSnap.data();
+            if(!userData) {
+                throw new Error("Document not found.");
+            }
 
-            querySnapshot.forEach((docSnapshot: DocumentData) => {
+            let uids = userData.friends;
+            uids.push(uid);
+            
+            let ret: SubmissionInfo[] = [];
+            const q = query(collection(this.db, SUBMISSION_COLLECTION), where("creatorId", "in", uids));
+            const querySnapshot = await getDocs(q);
+
+            querySnapshot.forEach((docSnapshot) => {
                 ret.push(docSnapshot.data() as SubmissionInfo);
+                console.log(docSnapshot.id, " => ", docSnapshot.data());
             });
 
             return ret;

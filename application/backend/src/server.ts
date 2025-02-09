@@ -19,7 +19,7 @@ app.use(express.json());
 
 // Routes
 import submissionRoutes from "./routes/submissionRoutes";
-import authRoutes from "./routes/authRoutes";
+// import authRoutes from "./routes/authRoutes";
 import userRoutes from "./routes/userRoutes";
 import friendRoutes from "./routes/friendRoutes";
 import promptRoutes from "./routes/promptRoutes";
@@ -27,7 +27,7 @@ import contestRoutes from "./routes/contestRoutes";
 import { Prompt } from "interfaces/IPrompt";
 
 app.use("/api/submissions", submissionRoutes);
-app.use("/api/authentication", authRoutes);
+// app.use("/api/authentication", authRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/friends", friendRoutes);
 app.use("/api/prompt", promptRoutes);

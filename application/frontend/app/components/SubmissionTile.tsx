@@ -1,3 +1,4 @@
+import { router } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Dimensions } from 'react-native';
 import { SvgXml } from 'react-native-svg'; // Import SvgXml
@@ -70,7 +71,7 @@ const SubmissionTile = ({ submission }: { submission: Submission }) => {
       <Text style={styles.timeText}>Posted {submittedAt.toString()}</Text>
 
       <View style={styles.actions}>
-        <TouchableOpacity style={styles.button}>
+        <TouchableOpacity style={styles.button} onPress={() => router.push('../comments')}>
           <Text style={styles.buttonText}>Comment</Text>
         </TouchableOpacity>
       </View>
