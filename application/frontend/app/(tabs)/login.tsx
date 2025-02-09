@@ -23,5 +23,6 @@ export default function Index() {
         //         </View>
         //     </TouchableOpacity>
         // </View>
+        0
     );
 }

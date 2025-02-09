@@ -68,7 +68,7 @@ export class SubmissionDataHandler {
         }
     }
 
-    // CREATE
+    // Add a document into the database
     async addData(submissionData: SubmissionInfo) {
         try {
             await addDoc(collection(this.db, SUBMISSION_COLLECTION), submissionData);
@@ -77,7 +77,7 @@ export class SubmissionDataHandler {
         }
     }
 
-    // DESTROY
+    // Delete a document based on id
     async deleteData(id: string) {
         try {
             const docRef = doc(this.db, SUBMISSION_COLLECTION, id);
@@ -87,7 +87,7 @@ export class SubmissionDataHandler {
         }
     }
 
-    // UPDATE
+    // Update and existing document
     async updateData(id: string, updatedData: Partial<SubmissionInfo>) {
         try {
             const docRef = doc(this.db, SUBMISSION_COLLECTION, id);
