@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { ScrollView, View, Text, StyleSheet, Image, TouchableOpacity, Dimensions } from 'react-native';
 import Timer from '../components/ContestTimer';
 import { useRouter } from 'expo-router';
-import Header from '../components/Header';
+import Header from '../components/header';
 
 const { width, height } = Dimensions.get('window');
 

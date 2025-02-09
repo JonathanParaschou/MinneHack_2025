@@ -38,7 +38,7 @@ export default function Index() {
 
   return (
     <View style={styles.container}>
-      {/* <Header /> */}
+      <Header />
 
 
       <ScrollView contentContainerStyle={styles.scrollContent}>

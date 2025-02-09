@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Dimensions } from 'react-native';
-import SvgUri from 'react-native-svg-uri'; // This is one option to render SVG
+// import SvgUri from 'react-native-svg-uri'; // This is one option to render SVG
 
 const { width } = Dimensions.get('window');
 
@@ -16,11 +16,11 @@ const SubmissionTile = ({ submission }: { submission: Submission }) => {
 
   return (
     <View style={styles.tileContainer}>
-      <SvgUri
+      {/* <SvgUri
         width="100%" // Full width of the container
         height={width * 0.5} // Height based on width
         source={{ uri: photoURL }} // The URL of the SVG
-      />
+      /> */}
 
       <Text style={styles.timeText}>Posted {submittedAt.toString()}</Text>
 

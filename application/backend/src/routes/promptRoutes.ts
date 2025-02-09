@@ -18,7 +18,7 @@ router.get('/', async (req, res) => {
     }
 });
 
-router.post('/', async (req, res) => {
+router.post('/uid', async (req, res) => {
     try {
         const uid = req.body.uid;
         await db.addUID(uid);

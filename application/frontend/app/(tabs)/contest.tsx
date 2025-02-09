@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, Dimensions } from 'react-native';
 import { useRouter } from 'expo-router';
-import Header from '../components/Header';
+import Header from '../components/header';
 import Footer from '../components/Footer';
 import { fetchWithUid } from '../utils/fetch';
 import { ensureAuth, user } from '../utils/firebase';
