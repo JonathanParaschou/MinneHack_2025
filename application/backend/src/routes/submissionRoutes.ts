@@ -37,6 +37,20 @@ router.put('/:id', async (req, res) => {
     }
 });
 
+// update the rating of a submission
+router.put('/rating/:id', async (req, res) => {
+    try {
+        const value = req.body.value;
+        if (!value) {
+            throw new Error("Rating value not provided");
+        }
+        await db.updateRating(req.params.id, value);
+        res.status(200).json();
+    } catch (err: any) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
 // Delete an existing Submission
 router.delete('/:id', async (req, res) => {
     try {

@@ -74,6 +74,24 @@ export class SubmissionDataHandler {
         }
     }
 
+    async updateRating(id: string, stars: string) {
+        try {
+            const docRef = doc(this.db, SUBMISSION_COLLECTION, id);
+            const docSnap = await getDoc(docRef);
+            if (!docSnap.exists()) {
+                throw new Error("No such document!");
+            } else {
+                const data = docSnap.data();
+                data.votes = data.votes ? data.votes + 1 : 1;
+                data.rating = data.rating ? (data.rating + parseInt(stars)) / data.votes : stars;
+                await updateDoc(docRef, data);
+            }
+            console.log(`Document with ID ${id} updated.`);
+        } catch (e) {
+            throw new Error("Error updating document: " + e);
+        }
+    }
+
     // Delete a document based on id
     async deleteData(id: string) {
         try {

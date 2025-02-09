@@ -1,16 +1,20 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { ScrollView, View, Text, StyleSheet, Image, TouchableOpacity, Dimensions } from 'react-native';
 import Timer from '../components/ContestTimer';
 import { useRouter } from 'expo-router';
 import Header from '../components/header';
+import { fetchWithUid } from '../utils/fetch';
+import { ensureAuth, user } from '../utils/firebase';
+import Footer from '../components/Footer';
 
 const { width, height } = Dimensions.get('window');
 
 const VotingScreen = () => {
   const [image, setImage] = useState('https://via.placeholder.com/300'); // Placeholder image URL
+  const router = useRouter();
 
   const handleVote = (rating: any) => {
-    console.log(`Voted: ${rating}`);
+    // fetchWithUid('http://localhost:8080/api/submissions/rating/', {
     fetchNewImage();
   };
 
@@ -18,6 +22,26 @@ const VotingScreen = () => {
     // Placeholder function to simulate fetching a new image from a database
     setImage(`https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSYVx6CB56pxO8gwlzLLOkV8fPN0jfF3T_98w&s`);
   };
+
+  useEffect(() => {
+    async function load() {
+      await ensureAuth();
+      if (!user) {
+        router.push('/login');
+        return;
+      }
+
+      const response = await fetchWithUid('http://localhost:8080/api/submissions/', {}, (user as any).uid);
+      const data = await response.json();
+
+      const contestResponse = await fetch('http://localhost:8080/api/contest');
+      const contestData = await contestResponse.json();
+
+      const contestSubmissions = data.filter((submission: any) => (submission));
+      console.log(data);
+    }
+    load();
+  })
 
   return (
     <View style={styles.container}>
@@ -48,6 +72,7 @@ const VotingScreen = () => {
             </View>
         </View>
         </ScrollView>
+        <Footer />
     </View>
   );
 };

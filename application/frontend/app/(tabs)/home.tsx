@@ -5,6 +5,7 @@ import Footer from "../components/Footer";
 import Header from "../components/header";
 import SubmissionTile from "../components/SubmissionTile";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
+import { fetchWithUid } from "../utils/fetch";
 
 export default function Index() {
   const router = useRouter();
@@ -121,6 +122,7 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 30,
+    marginTop: 20,
     fontWeight: "bold",
     textAlign: "center",
     color: "#ffffff",

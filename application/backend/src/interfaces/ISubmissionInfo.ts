@@ -5,4 +5,6 @@ export interface SubmissionInfo {
     submittedAt: Date;
     comments: any[];
     contestId?: string;
+    votes?: number;
+    totalVotes?: number;
 }

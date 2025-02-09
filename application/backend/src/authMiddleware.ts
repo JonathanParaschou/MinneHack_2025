@@ -21,7 +21,9 @@ export async function authenticate(req: any, res: any, next: any) {
         const usersRef = collection(db, AUTHENTICATION_COLLECTION);
         const q = query(usersRef, where('uid', '==', uid));
         const querySnapshot = await getDocs(q);
+            
         if (querySnapshot.empty) {
+            console.log(uid);
             return res.status(401).json({ error: "Unauthorized" });
         }
         else {
