@@ -9,6 +9,7 @@ import authRoutes from "./routes/authRoutes";
 import userRoutes from "./routes/userRoutes";
 import friendRoutes from "./routes/friendRoutes";
 import promptRoutes from "./routes/promptRoutes";
+import contestRoutes from "./routes/contestRoutes";
 
 dotenv.config();
 
@@ -24,6 +25,7 @@ app.use("/api/authentication", authRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/friends", friendRoutes);
 app.use("/api/prompt", promptRoutes);
+app.use("/api/contests", contestRoutes);
 
 app.listen(PORT, () => {
   console.log(`Server listening at http://localhost:${PORT}`);

@@ -1,95 +1,132 @@
-// import React from 'react';
-// import { View, Text, Image, StyleSheet, Dimensions } from 'react-native';
-// import { useRouter } from 'expo-router'; // Use expo-router's useRouter for navigation
-// import Timer from '../components/ContestTimer'; // Import the Timer component
+import React, { useEffect, useState } from 'react';
+import { View, Text, StyleSheet, Dimensions } from 'react-native';
+import { useRouter } from 'expo-router';
+import Header from '../components/Header';
+import Footer from '../components/Footer';
+import { fetchWithUid } from '../utils/fetch';
+import { ensureAuth, user } from '../utils/firebase';
+import { NavigationOptions } from 'expo-router/build/global-state/routing';
 
-// const { width } = Dimensions.get('window'); // Get the window width for responsive styling
+const { width, height } = Dimensions.get('window');
 
-// const ContestScreen = () => {
-//   const router = useRouter(); // Using useRouter for navigation
-//   const contestStartTime = new Date('2025-02-10T00:00:00'); // Example contest start time
-//   const timeRemaining = contestStartTime - new Date();
+const ContestScreen = () => {
+    const router = useRouter();
+    let currentTime = new Date();
+    const [data, setData] = useState({});
 
-//   const handleTimeEnd = () => {
-//     router.push('/voting'); // Navigate to /rating when time is up
-//   };
+    // 'not started', 'in progress', 'voting', 'ended'
+    const [contestFlag, setContestFlag] = useState('not started');
 
-//   return (
-//     <View style={styles.container}>
-//       <View style={styles.header}>
-//         <Image
-//           // source={require('../images/user-friends.png')} // Convert your SVG to PNG or use a library like react-native-svg
-//           style={styles.friends}
-//         />
-//         <Text style={styles.title}>DrawIt.</Text>
-//         <Text style={styles.user}>User photo</Text> {/* Example text for the user photo */}
-//       </View>
-//       <View>
-//         <Text style={styles.countdownText}>Contest ends in:</Text>
-//         <Timer duration={timeRemaining} onTimeEnd={handleTimeEnd} />
-//         {/* Add your Draw component here */}
-//       </View>
-//     </View>
-//   );
-// };
-//   return (
-//     <View style={styles.container}>
-//       <View style={styles.header}>
-//         <Image
-//           source={require('../images/user-friends.png')} // Convert your SVG to PNG or use a library like react-native-svg
-//           style={styles.friends}
-//         />
-//         <Text style={styles.title}>DrawIt.</Text>
-//         <Text style={styles.user}>User photo</Text> {/* Example text for the user photo */}
-//       </View>
-//       <View>
-//         <Text style={styles.countdownText}>Contest ends in:</Text>
-//         <Timer duration={timeRemaining} onTimeEnd={handleTimeEnd} />
-//         {/* Add your Draw component here */}
-//       </View>
-//     </View>
-//   );
-// };
+    useEffect(() => {
+        async function load() {
+            await ensureAuth();
+            if (!user) {
+                router.push('/login');
+                return;
+            }
 
-// const styles = StyleSheet.create({
-//   container: {
-//     flex: 1,
-//     backgroundColor: '#121212', // Dark background for the whole screen
-//     color: '#ffffff',
-//   },
-//   header: {
-//     flexDirection: 'row',
-//     alignItems: 'center',
-//     justifyContent: 'center',
-//     borderBottomColor: '#444', // Lighter border color
-//     borderBottomWidth: 1,
-//     backgroundColor: '#1f1f1f', // Dark background for the header
-//     paddingVertical: 10,
-//     paddingHorizontal: 15,
-//   },
-//   friends: {
-//     width: width * 0.08,
-//     height: width * 0.08,
-//   },
-//   user: {
-//     height: width * 0.06,
-//     width: width * 0.06,
-//     borderRadius: 15,
-//     backgroundColor: '#ccc', // Placeholder for user photo
-//   },
-//   title: {
-//     fontSize: 30,
-//     fontWeight: 'bold',
-//     flex: 1,
-//     textAlign: 'center',
-//     color: '#ffffff', // White text for the dark mode
-//   },
-//   countdownText: {
-//     color: '#ffffff', // White text color for the countdown
-//     textAlign: 'center',
-//     fontSize: 20,
-//     marginVertical: 20,
-//   },
-// });
+            const response = await fetchWithUid('http://localhost:8080/api/contests', {}, user.uid);
+            const respData = await response.json();
+            const date = new Date(respData.time.seconds * 1000);
+            respData.time = date;
+            setData(respData);
 
-// export default ContestScreen;
+            const votingTime = new Date(date.getTime() + 5 * 60000);
+            const contestEndTime = new Date(date.getTime() + 15 * 60000);
+
+            router.push(`/draw?id=${respData.contestId}`);
+            return;
+            
+            currentTime = new Date();
+            if (currentTime < date) {
+                setContestFlag('not started');
+            }
+            else if (currentTime < votingTime) {
+                setContestFlag('in progress');
+                router.push(`/draw?id=${respData.contestId}`);
+                return;
+            }
+            else if (currentTime < contestEndTime) {
+                setContestFlag('voting');
+                router.push('/voting');
+                return;
+            }
+            else {
+                setContestFlag('ended');
+            }
+
+            //check time and update accordingly
+            const interval = setInterval(() => {
+                currentTime = new Date();
+                if (currentTime < date) {
+                    setContestFlag('not started');
+                }
+                else if (currentTime < votingTime) {
+                    setContestFlag('in progress');
+                    router.push(`/draw?id=${respData.contestId}`);
+                    clearInterval(interval);
+                }
+                else if (currentTime < contestEndTime) {
+                    setContestFlag('voting');
+                    router.push('/voting');
+                    clearInterval(interval);
+                }
+                else {
+                    setContestFlag('ended');
+                }
+            }, 1000);
+
+            //clear interval on un-mount
+            return () => clearInterval(interval);
+        }
+        load();
+    }, []);
+
+    return (
+        <View style={styles.container}>
+            <Header />
+            
+            {/* Content wrapper that pushes the footer down */}
+            <View style={styles.content}>
+                { contestFlag === 'not started' ? 
+                    <View>
+                        <Text style={styles.countdownText}>Contest has not started yet!</Text> 
+                        <Text style={[styles.countdownText, {marginTop: -10, fontSize: 12}]}>Starts at: {data.time?.toLocaleString()}</Text>
+                        <Text style={styles.countdownText}>Get those drawing skills ready!</Text>
+                    </View>
+                : contestFlag === 'ended' ? 
+                    <Text style={styles.countdownText}>Contest has ended</Text> 
+                :
+                    <Text style={styles.countdownText}>Contest ends in:</Text>
+                }
+            </View>
+            
+            <Footer />
+        </View>
+    );
+};
+
+const styles = StyleSheet.create({
+    container: {
+        flex: 1, // Ensures full height usage
+        backgroundColor: '#121212',
+    },
+    content: {
+        flex: 1, // Pushes the footer to the bottom
+        justifyContent: 'center', // Center content vertically
+        alignItems: 'center', // Center content horizontally
+    },
+    countdownText: {
+        color: '#ffffff',
+        textAlign: 'center',
+        fontSize: 20,
+        marginVertical: 20,
+    },
+    footer: {
+        width: '100%',
+        position: 'absolute', // Ensures it stays at the bottom
+        bottom: 0,
+    },
+});
+
+export default ContestScreen;

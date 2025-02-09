@@ -1,21 +1,15 @@
 import React, { useState } from 'react';
 import { ScrollView, View, Text, StyleSheet, Image, TouchableOpacity, Dimensions } from 'react-native';
 import Timer from '../components/ContestTimer';
+import { useRouter } from 'expo-router';
+import Header from '../components/Header';
 
 const { width, height } = Dimensions.get('window');
 
 const VotingScreen = () => {
-  const router = useRouter(); // Using useRouter for navigation
-  const contestStartTime = new Date('2025-02-10T00:00:00'); // Example contest start time
-  const timeRemaining = contestStartTime - new Date();
-
-  const handleTimeEnd = () => {
-    router.push('/timelocation'); // Navigate to /rating when time is up
-  };
-
   const [image, setImage] = useState('https://via.placeholder.com/300'); // Placeholder image URL
 
-  const handleVote = (rating) => {
+  const handleVote = (rating: any) => {
     console.log(`Voted: ${rating}`);
     fetchNewImage();
   };
@@ -26,32 +20,35 @@ const VotingScreen = () => {
   };
 
   return (
-    <ScrollView style={styles.container}>
-        <View style={styles.header}>
-        <Image
-          source={require('../images/user-friends.svg')}
-          style={styles.friends}
-        />
-        <Text style={styles.title}>
-          DrawIt.
-        </Text>
-        <Text>
-          User photo
-        </Text>
-      </View>
-      <View style={styles.content}>
-        <Text style={styles.text}>Vote on the Drawings!.</Text>
-        <Image source={{ uri: image }} style={styles.image} />
-        <Text style={styles.prompt}>Rate this drawing:</Text>
-        <View style={styles.ratingContainer}>
-          {[1, 2, 3, 4, 5, 6, 7, 8].map((num) => (
-            <TouchableOpacity key={num} style={styles.button} onPress={() => handleVote(num)}>
-              <Text style={styles.buttonText}>{num}</Text>
-            </TouchableOpacity>
-          ))}
+    <View style={styles.container}>
+        <Header />
+        <ScrollView style={styles.container}>
+            <View style={styles.header}>
+            <Image
+            source={require('../images/user-friends.svg')}
+            style={styles.friends}
+            />
+            <Text style={styles.title}>
+            DrawIt.
+            </Text>
+            <Text>
+            User photo
+            </Text>
         </View>
-      </View>
-    </ScrollView>
+        <View style={styles.content}>
+            <Text style={styles.text}>Vote on the Drawings!</Text>
+            <Image source={{ uri: image }} style={styles.image} />
+            <Text style={styles.prompt}>Rate this drawing:</Text>
+            <View style={styles.ratingContainer}>
+            {[1, 2, 3, 4, 5].map((num) => (
+                <TouchableOpacity key={num} style={styles.button} onPress={() => handleVote(num)}>
+                <Text style={styles.buttonText}>{num}</Text>
+                </TouchableOpacity>
+            ))}
+            </View>
+        </View>
+        </ScrollView>
+    </View>
   );
 };
 

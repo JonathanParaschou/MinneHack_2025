@@ -13,9 +13,9 @@ const Footer = () => {
       <TouchableOpacity style={styles.button} onPress={() => router.push('/home')}>
         <Text style={styles.text}>Home</Text>
       </TouchableOpacity>
-      <TouchableOpacity style={styles.button} onPress={() => router.push('/map')}>
+      {/* <TouchableOpacity style={styles.button} onPress={() => router.push('/map')}>
         <Text style={styles.text}>Heatmap</Text>
-      </TouchableOpacity>
+      </TouchableOpacity> */}
     </View>
   );
 };
