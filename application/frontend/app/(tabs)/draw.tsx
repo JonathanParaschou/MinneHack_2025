@@ -75,7 +75,7 @@ export default function DrawPage() {
           `<path d="${path}" stroke="${color}" stroke-width="${width}" fill="none" />`
       )
       .join("")}</svg>`;
-    
+
     // Convert SVG to Blob (you can adjust this method depending on your library/tools)
     const svgBlob = new Blob([svg], { type: "image/svg+xml" });
 
@@ -119,10 +119,17 @@ export default function DrawPage() {
             },
             body: JSON.stringify(submissionObj),
           })
-            .then((response) => response.json())
-            .then((data) => {
-              console.log("Success:", data);
-              router.push('/home');
+            .then(() => {
+              // response.json();
+              fetch("http://localhost:8080/api/prompt/uid", {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ uid: user?.uid }),
+              }).then(() => {
+                router.push('/home');
+              })
             })
             .catch((error) => {
               console.error("Error:", error);
@@ -193,56 +200,56 @@ export default function DrawPage() {
         const startTime = new Date(respData.time.seconds * 1000);
         respData.time = startTime;
 
-        const votingTime = new Date(startTime.getTime() + 500 * 60000);
-        const contestEndTime = new Date(startTime.getTime() + 15 * 60000);
+      const votingTime = new Date(startTime.getTime() + 500 * 60000);
+      const contestEndTime = new Date(startTime.getTime() + 15 * 60000);
 
-        let currentTime = new Date();
+      let currentTime = new Date();
 
-        //contest has not started
-        if (currentTime < startTime) {
-            router.push('/home');
-            return;
-        }
-        else if (currentTime < votingTime) { //contest is in progress, let them continue
-          console.log(secondsToMinutes((votingTime.getTime() - currentTime.getTime()) / 1000))
-          setTimeLeft(secondsToMinutes((votingTime.getTime() - currentTime.getTime()) / 1000));
-        }
-        else if (currentTime < contestEndTime) { //voting has started
-            router.push('/voting');
-            return;
-        }
-        else { //contest has ended
-            router.push('/home');
-            return;
-        }
+      //contest has not started
+      if (currentTime < startTime) {
+        router.push('/home');
+        return;
+      }
+      else if (currentTime < votingTime) { //contest is in progress, let them continue
+        console.log(secondsToMinutes((votingTime.getTime() - currentTime.getTime()) / 1000))
+        setTimeLeft(secondsToMinutes((votingTime.getTime() - currentTime.getTime()) / 1000));
+      }
+      else if (currentTime < contestEndTime) { //voting has started
+        router.push('/voting');
+        return;
+      }
+      else { //contest has ended
+        router.push('/home');
+        return;
+      }
 
         // //check time and update accordingly
         interval = setInterval(() => {
             let currentTime = new Date();
 
-            //contest has not started
-            if (currentTime < startTime) {
-                router.push('/home');
-                clearInterval(interval);
-            }
-            else if (currentTime < votingTime) { //contest is in progress
-              setTimeLeft(secondsToMinutes((votingTime.getTime() - currentTime.getTime()) / 1000));
-            }
-            else if (currentTime < contestEndTime) { //voting has started
-                if (((currentTime as any) - (votingTime as any)) > 2000) {
-                  handlePost();
-                }
-                router.push('/voting');
-                clearInterval(interval);
-            }
-            else { //contest has ended
-                router.push('/home');
-                clearInterval(interval);
-            }
-        }, 1000);
+        //contest has not started
+        if (currentTime < startTime) {
+          router.push('/home');
+          clearInterval(interval);
+        }
+        else if (currentTime < votingTime) { //contest is in progress
+          setTimeLeft(secondsToMinutes((votingTime.getTime() - currentTime.getTime()) / 1000));
+        }
+        else if (currentTime < contestEndTime) { //voting has started
+          if (((currentTime as any) - (votingTime as any)) > 2000) {
+            handlePost();
+          }
+          router.push('/voting');
+          clearInterval(interval);
+        }
+        else { //contest has ended
+          router.push('/home');
+          clearInterval(interval);
+        }
+      }, 1000);
 
-        //clear interval on un-mount
-        return () => clearInterval(interval);
+      //clear interval on un-mount
+      return () => clearInterval(interval);
     }
     load();
   }, []);
@@ -305,13 +312,13 @@ export default function DrawPage() {
 
       <View style={styles.buttonContainer}>
         <TouchableOpacity onPress={handlePost} style={styles.button}>
-                  <Text style={styles.buttonText}>Post</Text>
+          <Text style={styles.buttonText}>Post</Text>
         </TouchableOpacity>
         <TouchableOpacity onPress={clearCanvas} style={styles.button}>
-                  <Text style={styles.buttonText}>Clear Canvas</Text>
+          <Text style={styles.buttonText}>Clear Canvas</Text>
         </TouchableOpacity>
         <TouchableOpacity onPress={undoDrawing} style={styles.button}>
-                  <Text style={styles.buttonText}>Undo</Text>
+          <Text style={styles.buttonText}>Undo</Text>
         </TouchableOpacity>
       </View>
     </View>

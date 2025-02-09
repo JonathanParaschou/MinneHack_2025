@@ -3,6 +3,7 @@ import { FirebaseApp, initializeApp } from "firebase/app";
 import { getFirestore, collection, getDocs, addDoc, Firestore, deleteDoc, doc, updateDoc, DocumentData, query, where, getDoc } from "firebase/firestore";
 import { firebaseConfig } from "../constants/firebaseConstants";
 import { PROMPT_COLLECTION } from "../constants/firebaseConstants";
+import { Prompt } from "interfaces/IPrompt";
 
 export class PromptDataHandler {
     app: FirebaseApp | undefined;
@@ -15,13 +16,18 @@ export class PromptDataHandler {
     }
 
     // Fetches all submission data from the database
+
     async fetchPrompt() {
         try {
-            const docRef = await doc(collection(this.db, PROMPT_COLLECTION));
+            const docRef = doc(this.db, PROMPT_COLLECTION, "prompt_master");
             const docSnap = await getDoc(docRef);
-            const data = docSnap.data();
 
-            return data;
+            if (docSnap.exists()) {
+                return docSnap.data();
+            } else {
+                console.log("No such document!");
+                return null;
+            }
         } catch (e) {
             console.error("Error fetching data: ", e);
         }
@@ -29,10 +35,11 @@ export class PromptDataHandler {
 
     async addUID(uid: string) {
         try {
-            const docRef = await doc(collection(this.db, PROMPT_COLLECTION));
+            const docRef = doc(this.db, PROMPT_COLLECTION, "prompt_master");
             const docSnap = await getDoc(docRef);
             const data = docSnap.data();
 
+            console.log(data);
             if (!data) {
                 throw new Error("Document not found.");
             }
@@ -46,17 +53,10 @@ export class PromptDataHandler {
         }
     }
 
-    async replacePrompt(prompt: string) {
+    async replacePrompt(prompt: Prompt) {
         try {
-            const docRef = await doc(collection(this.db, PROMPT_COLLECTION));
-            const docSnap = await getDoc(docRef);
-            const data = docSnap.data();
-
-            if (!data) {
-                throw new Error("Document not found.");
-            }
-
-            await updateDoc(docRef, { prompt: prompt });
+            const docRef = doc(this.db, PROMPT_COLLECTION, "prompt_master");
+            await updateDoc(docRef, { prompt: prompt.prompt, uids: prompt.uids, time: prompt.time });
         } catch (e) {
             console.error("Error replacing prompt: ", e);
         }
