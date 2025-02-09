@@ -34,7 +34,7 @@ export class SubmissionDataHandler {
             const docRefPrompt = doc(this.db, PROMPT_COLLECTION, "prompt_master");
             const docSnapPrompt = await getDoc(docRefPrompt);
             const promptData = docSnapPrompt.data();
-            if(!promptData) {
+            if (!promptData) {
                 throw new Error("Document not found.");
             }
 
@@ -45,7 +45,9 @@ export class SubmissionDataHandler {
             const querySnapshot = await getDocs(q);
 
             querySnapshot.forEach((docSnapshot) => {
-                ret.push(docSnapshot.data() as SubmissionInfo);
+                const data = docSnapshot.data() as SubmissionInfo;
+                data.submissionId = docSnapshot.id;
+                ret.push(data);
                 console.log(docSnapshot.id, " => ", docSnapshot.data());
             });
 

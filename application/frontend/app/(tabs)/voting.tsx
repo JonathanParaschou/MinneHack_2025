@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { ScrollView, View, Text, StyleSheet, Image, TouchableOpacity, Dimensions } from 'react-native';
-import Timer from '../components/ContestTimer';
+import { SvgXml } from 'react-native-svg'; // Import SvgXml
 import { useRouter } from 'expo-router';
 import Header from '../components/header';
 import { fetchWithUid } from '../utils/fetch';
@@ -10,17 +10,48 @@ import Footer from '../components/Footer';
 const { width, height } = Dimensions.get('window');
 
 const VotingScreen = () => {
-  const [image, setImage] = useState('https://via.placeholder.com/300'); // Placeholder image URL
+  const [index, setIndex] = useState(0);
+  const [svgContent, setSvgContent] = useState<string | null>(null); // State to hold the fetched SVG content
+  const [svgWidth, setSvgWidth] = useState<number>(0);
+  const [svgHeight, setSvgHeight] = useState<number>(0);
+  const [contestData, setContestData] = useState([]);
   const router = useRouter();
 
-  const handleVote = (rating: any) => {
-    // fetchWithUid('http://localhost:8080/api/submissions/rating/', {
+  const handleVote = (rating: any, id: any) => {
+    fetchWithUid(`http://localhost:8080/api/submissions/rating/${id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ value: rating }),
+    }, (user as any).uid);
     fetchNewImage();
   };
 
   const fetchNewImage = () => {
-    // Placeholder function to simulate fetching a new image from a database
-    setImage(`https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSYVx6CB56pxO8gwlzLLOkV8fPN0jfF3T_98w&s`);
+    // if (index === contestData.length - 1) {
+    //   router.push('/results');
+    // }
+    setIndex((index + 1));
+
+    fetchSvg();
+  };
+
+  const fetchSvg = async () => {
+    try {
+      console.log(contestData);
+      const response = await fetch((contestData[index] as any).photoURL);
+      const svgText = await response.text();
+      setSvgContent(svgText);
+
+      // Extract width and height from the SVG viewBox
+      const match = svgText.match(/viewBox="0 0 (\d+) (\d+)"/);
+      if (match) {
+        const [_, width, height] = match;
+        setSvgWidth(parseInt(width, 10));
+        setSvgHeight(parseInt(height, 10));
+      }
+    } catch (error) {
+      console.error('Error fetching SVG:', error);
+    }
   };
 
   useEffect(() => {
@@ -34,46 +65,58 @@ const VotingScreen = () => {
       const response = await fetchWithUid('http://localhost:8080/api/submissions/', {}, (user as any).uid);
       const data = await response.json();
       console.log(data);
+      
+      setContestData(data);
+
 
       const contestResponse = await fetch('http://localhost:8080/api/contests');
-      const contestData = await contestResponse.json();
+      const contestDataTemp = await contestResponse.json();
 
-      console.log(contestData);
+      //use this later
+      // const contestSubmissions = data.filter((submission: any) => (submission.contestId && submission.contestId === contestData.id));
 
-      const contestSubmissions = data.filter((submission: any) => (submission.contestId && submission.contestId === contestData.id));
-      console.log(contestSubmissions);
+      fetchNewImage();
     }
     load();
-  });
+  }, []);
+
+    // Calculate aspect ratio of the SVG
+    const aspectRatio = svgWidth && svgHeight ? svgWidth / svgHeight : 1;
+
+    // Limit the max height and width
+    const maxWidth = width * 0.9; // Max width to 90% of the screen width
+    const maxHeight = height * 0.5; // Max height to 50% of the screen height
+
+    // Calculate the desired width and height based on the aspect ratio
+    let svgWidthAdjusted = maxWidth;
+    let svgHeightAdjusted = maxWidth / aspectRatio;
+
+    // If the height exceeds the max height, adjust accordingly
+    if (svgHeightAdjusted > maxHeight) {
+      svgHeightAdjusted = maxHeight;
+      svgWidthAdjusted = maxHeight * aspectRatio;
+    }
 
   return (
     <View style={styles.container}>
         <Header />
         <ScrollView style={styles.container}>
-            <View style={styles.header}>
-            <Image
-            source={require('../images/user-friends.svg')}
-            style={styles.friends}
-            />
-            <Text style={styles.title}>
-            DrawIt.
-            </Text>
-            <Text>
-            User photo
-            </Text>
-        </View>
-        <View style={styles.content}>
-            <Text style={styles.text}>Vote on the Drawings!</Text>
-            <Image source={{ uri: image }} style={styles.image} />
-            <Text style={styles.prompt}>Rate this drawing:</Text>
-            <View style={styles.ratingContainer}>
-            {[1, 2, 3, 4, 5].map((num) => (
-                <TouchableOpacity key={num} style={styles.button} onPress={() => handleVote(num)}>
-                <Text style={styles.buttonText}>{num}</Text>
-                </TouchableOpacity>
-            ))}
-            </View>
-        </View>
+          <View style={styles.content}>
+              <Text style={styles.voteText}>Vote on the Drawings!</Text>
+                {svgContent ? (
+                  <SvgXml xml={svgContent} style={styles.image} width={svgWidthAdjusted} height={svgHeightAdjusted} />
+                ) : (
+                  <Text style={styles.timeText}>Loading SVG...</Text>
+                )}
+              <Text style={styles.prompt}>Rate this drawing:</Text>
+              <View style={styles.ratingContainer}>
+              {[1, 2, 3, 4, 5].map((num) => (
+                  <TouchableOpacity key={num} style={styles.button} onPress={() => handleVote(num)}>
+                  <Text style={styles.buttonText}>{num}</Text>
+                  </TouchableOpacity>
+              ))}
+              </View>
+          </View>
         </ScrollView>
         <Footer />
     </View>
@@ -81,6 +124,12 @@ const VotingScreen = () => {
 };
 
 const styles = StyleSheet.create({
+  voteText: {
+    fontSize: 24,
+    color: '#ffffff',
+    marginBottom: 10,
+    marginTop: 65
+  },
     container: {
         flex: 1,
         backgroundColor: '#121212', // Dark background for the whole screen

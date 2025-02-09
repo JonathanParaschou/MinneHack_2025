@@ -33,9 +33,6 @@ const ContestScreen = () => {
 
             const votingTime = new Date(date.getTime() + 5 * 60000);
             const contestEndTime = new Date(date.getTime() + 15 * 60000);
-
-            router.push(`/draw?id=${respData.contestId}`);
-            return;
             
             currentTime = new Date();
             if (currentTime < date) {
