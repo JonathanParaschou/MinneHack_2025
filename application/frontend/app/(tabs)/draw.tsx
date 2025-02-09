@@ -106,7 +106,7 @@ export default function DrawPage() {
   
           const submissionObj: any = {
             photoURL: downloadURL,
-            prompt: "Draw something",
+            prompt: prompt || "Unknown Prompt",
             creatorId: (user as any).uid || "anonymous",
             submittedAt: new Date(),
             comments: [],
@@ -179,7 +179,7 @@ export default function DrawPage() {
           setPrompt(promptData.prompt);
 
           let startTime = new Date();
-          let endTime = new Date(startTime.getTime() + 5 * 60000);
+          let endTime = new Date(startTime.getTime() + 2 * 60000);
           setTimeLeft(secondsToMinutes((endTime.getTime() - startTime.getTime()) / 1000));
 
           interval = setInterval(() => {
@@ -258,10 +258,11 @@ export default function DrawPage() {
         }
       }, 1000);
 
-      //clear interval on un-mount
-      return () => clearInterval(interval);
-    }
+      }
     load();
+
+    //clear interval on un-mount
+    return () => clearInterval(interval);
   }, []);
 
   return (
