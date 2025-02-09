@@ -1,7 +1,12 @@
 import React, { useState } from 'react';
 import { ScrollView, View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native';
+import Timer from '../components/ContestTimer';
 
 const VotingProcessScreen = () => {
+  const router = useRouter(); // Using useRouter for navigation
+  const contestStartTime = new Date('2025-02-10T00:00:00'); // Example contest start time
+  const timeRemaining = contestStartTime - new Date();
+
   const [step, setStep] = useState(1);
   const [selectedImage, setSelectedImage] = useState(null);
   const [selectedTime, setSelectedTime] = useState(null);

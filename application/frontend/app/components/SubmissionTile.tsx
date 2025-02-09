@@ -1,25 +1,31 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, Image, StyleSheet, Dimensions } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, Dimensions } from 'react-native';
+import SvgUri from 'react-native-svg'; // This is one option to render SVG
 
 const { width } = Dimensions.get('window');
 
-const SubmissionTile = () => {
+interface Submission {
+  photoURL: string;
+  creatorId: string;
+  submittedAt: Date;
+  prompt: string;
+}
+
+const SubmissionTile = ({ submission }: { submission: Submission }) => {
+  // Destructure the properties from the submission prop
+  console.log(submission);
+  
+  const { photoURL, creatorId, submittedAt, prompt } = submission;
   return (
     <View style={styles.tileContainer}>
-      <View style={styles.header}>
-        <Image 
-          source={{ uri: 'https://raw.githubusercontent.com/PeterOlsen1/coderunner/refs/heads/main/static/favicon.ico' }} // Replace with a local or remote image
-          style={styles.avatar}
-        />
-        <Text style={styles.userName}>John Doe</Text>
-      </View>
+      {/* Render the post image if it's an SVG */}
+      {/* <SvgUri
+        width="100%" // Full width of the container
+        height={width * 0.5} // Same height as before
+        uri={photoURL}  // The URL of the SVG image
+      /> */}
 
-      <Image
-        source={{ uri: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSYVx6CB56pxO8gwlzLLOkV8fPN0jfF3T_98w&s' }} // Replace with a local or remote image
-        style={styles.postImage}
-      />
-
-      <Text style={styles.timeText}>Posted 5 minutes ago</Text>
+      <Text style={styles.timeText}>Posted {submittedAt.toString()}</Text>
 
       <View style={styles.actions}>
         <TouchableOpacity style={styles.button}>
@@ -32,7 +38,7 @@ const SubmissionTile = () => {
 
 const styles = StyleSheet.create({
   tileContainer: {
-    backgroundColor: 'rgba(',
+    backgroundColor: '#1f1f1f',
     borderRadius: 10,
     margin: 10,
     padding: 15,
@@ -59,7 +65,7 @@ const styles = StyleSheet.create({
   },
   postImage: {
     width: '100%',
-    height: width * 0.5, // Image takes half of the screen width
+    height: width * 0.5,
     borderRadius: 10,
     marginVertical: 15,
   },

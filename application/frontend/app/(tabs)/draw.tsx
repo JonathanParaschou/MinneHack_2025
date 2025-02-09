@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { View, Button, StyleSheet, Text, Alert } from "react-native";
+import { View, Button, StyleSheet, Text, Alert, TouchableOpacity } from "react-native";
 import Svg, { Path } from "react-native-svg";
 import Slider from "@react-native-community/slider";
 import { getStorage, ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
@@ -22,10 +22,21 @@ const auth = getAuth(app);
 const storage = getStorage(app);
 
 export default function DrawPage() {
-  const [paths, setPaths] = useState<Array<string>>([]); // Store drawn paths
+  const [paths, setPaths] = useState<Array<{ path: string, color: string, width: number }>>([]); // Store drawn paths with their color and width
   const [currentPath, setCurrentPath] = useState<string>(""); // Path being drawn
   const [strokeColor, setStrokeColor] = useState<string>("#FF0000"); // Default color (Red)
   const [strokeWidth, setStrokeWidth] = useState<number>(5); // Default brush size
+
+  const colorOptions = [
+    "#FF0000", // Red
+    "#00FF00", // Green
+    "#0000FF", // Blue
+    "#FFFF00", // Yellow
+    "#FF00FF", // Magenta
+    "#00FFFF", // Cyan
+    "#FFFFFF", // White
+    "#000000", // Black
+  ];
 
   // Handle touch start (begin drawing)
   const handleTouchStart = (event: any) => {
@@ -45,7 +56,8 @@ export default function DrawPage() {
   // Handle touch end (finish drawing)
   const handleTouchEnd = () => {
     if (currentPath) {
-      setPaths([...paths, currentPath]); // Add the current path to paths state
+      // Add the current path with its color and width to the paths state
+      setPaths([...paths, { path: currentPath, color: strokeColor, width: strokeWidth }]);
       setCurrentPath(""); // Reset current path for the next drawing
     }
   };
@@ -54,8 +66,8 @@ export default function DrawPage() {
   const handlePost = async () => {
     const svg = `<svg width="300" height="400">${paths
       .map(
-        (path) =>
-          `<path d="${path}" stroke="${strokeColor}" stroke-width="${strokeWidth}" fill="none" />`
+        ({ path, color, width }) =>
+          `<path d="${path}" stroke="${color}" stroke-width="${width}" fill="none" />`
       )
       .join("")}</svg>`;
     
@@ -87,7 +99,7 @@ export default function DrawPage() {
             creatorId: "TestUser",
             submittedAt: new Date(),
             comments: []
-          }
+          };
 
           // MAKE A POST TO THE NODE API
           fetch("http://localhost:5000/api/submissions", {
@@ -121,6 +133,16 @@ export default function DrawPage() {
 
   return (
     <View style={styles.container}>
+      {/* Color Picker (Circles) */}
+      <View style={styles.colorPickerContainer}>
+        {colorOptions.map((color, index) => (
+          <TouchableOpacity
+            key={index}
+            style={[styles.colorCircle, { backgroundColor: color }]}
+            onPress={() => setStrokeColor(color)} // Set selected color
+          />
+        ))}
+      </View>
       {/* Brush Size Slider */}
       <View style={styles.sliderContainer}>
         <Text style={styles.text}>Brush Size</Text>
@@ -143,12 +165,12 @@ export default function DrawPage() {
       >
         <Svg width="300" height="400">
           {/* Render all paths */}
-          {paths.map((path, index) => (
+          {paths.map(({ path, color, width }, index) => (
             <Path
               key={index}
               d={path}
-              stroke={strokeColor}
-              strokeWidth={strokeWidth}
+              stroke={color}
+              strokeWidth={width}
               fill="none"
             />
           ))}
@@ -164,13 +186,17 @@ export default function DrawPage() {
         </Svg>
       </View>
 
-      {/* Buttons for additional functionalities */}
       <View style={styles.buttonContainer}>
-        <Button title="Post" onPress={handlePost} />
-        <Button title="Clear Canvas" onPress={clearCanvas} />
-        <Button title="Undo" onPress={undoDrawing} />
+        <TouchableOpacity onPress={handlePost} style={styles.button}>
+                  <Text style={styles.buttonText}>Post</Text>
+        </TouchableOpacity>
+        <TouchableOpacity onPress={clearCanvas} style={styles.button}>
+                  <Text style={styles.buttonText}>Clear Canvas</Text>
+        </TouchableOpacity>
+        <TouchableOpacity onPress={undoDrawing} style={styles.button}>
+                  <Text style={styles.buttonText}>Undo</Text>
+        </TouchableOpacity>
       </View>
-
     </View>
   );
 }
@@ -204,5 +230,28 @@ const styles = StyleSheet.create({
     color: "white",
     textAlign: "center",
     marginBottom: 10,
+  },
+  colorPickerContainer: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    justifyContent: "center",
+    marginBottom: 20,
+    width: "80%",
+  },
+  colorCircle: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    margin: 5,
+  },
+  button: {
+    backgroundColor: '#FFF',
+    paddingVertical: 8,
+    paddingHorizontal: 15,
+    borderRadius: 5,
+  },
+  buttonText: {
+    color: '#GGG',
+    fontWeight: 'bold',
   },
 });
