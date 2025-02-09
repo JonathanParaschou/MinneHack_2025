@@ -14,24 +14,24 @@
 //     router.push('/voting'); // Navigate to /rating when time is up
 //   };
 
-  return (
-    <View style={styles.container}>
-      <View style={styles.header}>
-        <Image
-          // source={require('../images/user-friends.png')} // Convert your SVG to PNG or use a library like react-native-svg
-          style={styles.friends}
-        />
-        <Text style={styles.title}>DrawIt.</Text>
-        <Text style={styles.user}>User photo</Text> {/* Example text for the user photo */}
-      </View>
-      <View>
-        <Text style={styles.countdownText}>Contest ends in:</Text>
-        <Timer duration={timeRemaining} onTimeEnd={handleTimeEnd} />
-        {/* Add your Draw component here */}
-      </View>
-    </View>
-  );
-};
+//   return (
+//     <View style={styles.container}>
+//       <View style={styles.header}>
+//         <Image
+//           // source={require('../images/user-friends.png')} // Convert your SVG to PNG or use a library like react-native-svg
+//           style={styles.friends}
+//         />
+//         <Text style={styles.title}>DrawIt.</Text>
+//         <Text style={styles.user}>User photo</Text> {/* Example text for the user photo */}
+//       </View>
+//       <View>
+//         <Text style={styles.countdownText}>Contest ends in:</Text>
+//         <Timer duration={timeRemaining} onTimeEnd={handleTimeEnd} />
+//         {/* Add your Draw component here */}
+//       </View>
+//     </View>
+//   );
+// };
 //   return (
 //     <View style={styles.container}>
 //       <View style={styles.header}>

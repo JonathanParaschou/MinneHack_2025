@@ -1,33 +1,40 @@
 import React from 'react';
 import { TouchableOpacity, View, Text, Image } from 'react-native';
-import { signInWithGoogle } from "../utils/firebase";
+import { signInWithGoogle, user } from "../utils/firebase";
 import styles from "../style/google-button";
 
-  
+interface UserInfo {
+    friends: string[];
+    email: string;
+    uid: string;
+    dispName:string;
+    photoURL: string;
+}
+
 export default function Index() {
-   
     const handlePress = async () => {
         try {
-            const userCredential = await signInWithGoogle();
-            const idToken = userCredential?.credential?.idToken;
-
-            if (idToken) {
-                // Send the ID token to the backend
-                const response = await fetch('http://local-host:80/api/authentication', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ token: idToken }), // Sending the token as JSON
-                });
-
-                if (response.ok) {
-                    // Handle successful login
-                    console.log('User successfully authenticated with backend!');
-                } else {
-                    console.log('Error authenticating with backend');
-                }
+            await signInWithGoogle();
+            if (!user) {
+                console.log('User not authenticated');
+                return;
             }
+            
+            const info: UserInfo = {
+                friends: [],
+                email: (user as any).email,
+                uid: (user as any).uid,
+                dispName: (user as any).displayName,
+                photoURL: (user as any).photoURL
+            }
+
+            fetch('http://localhost:8080/api/users', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(info)
+            });
         } 
         catch {
             console.log('uh oh!');

@@ -29,7 +29,7 @@ export default function Index() {
       <Header />
 
       <ScrollView contentContainerStyle={styles.scrollContent}>
-        {/* <TouchableOpacity style={styles.button} onPress={() => router.push('/(tabs)/draw')}>
+        <TouchableOpacity style={styles.button} onPress={() => router.push('/(tabs)/draw')}>
           <Text style={styles.buttonText}>Post</Text>
         </TouchableOpacity>
 
@@ -54,10 +54,6 @@ const styles = StyleSheet.create({
   scrollContent: {
     paddingTop: 60, // Ensure content starts below the fixed header
     paddingBottom: 20,
-  },
-  friends: {
-    width: width * 0.08,
-    height: width * 0.08,
   },
   button: {
     backgroundColor: '#FFF',

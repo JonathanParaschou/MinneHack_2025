@@ -1,8 +1,9 @@
 import { FirebaseApp, initializeApp } from "firebase/app";
-import { getFirestore, collection, getDocs, addDoc, Firestore, deleteDoc, doc, updateDoc, query, where, DocumentData } from "firebase/firestore";
+import { getFirestore, collection, getDocs, addDoc, Firestore, deleteDoc, doc, updateDoc, query, where, DocumentData, setDoc } from "firebase/firestore";
 import { firebaseConfig } from "../constants/firebaseConstants";
 import { AUTHENTICATION_COLLECTION } from "../constants/firebaseConstants";
 import { UserInfo } from "interfaces/IUserInfo";
+
 export class UserDataHandler {
     app: FirebaseApp | undefined;
     db: Firestore;
@@ -13,6 +14,23 @@ export class UserDataHandler {
         // Initialize Firestore
         this.db = getFirestore(app);
     }
+
+    // FETCH ALL DATA
+    async fetchAllData() {
+        try {
+            const usersRef = collection(this.db, AUTHENTICATION_COLLECTION);
+            const querySnapshot = await getDocs(usersRef);
+            let ret: UserInfo[] = [];
+            querySnapshot.forEach((docSnapshot: DocumentData) => {
+                console.log('user!');
+                ret.push(docSnapshot.data() as UserInfo);
+            });
+            return ret;
+        } catch (e) {
+            console.error("Error fetching data: ", e);
+        }
+    }
+
     // READ
     async fetchData(uid : string) {
         try {
@@ -36,23 +54,17 @@ export class UserDataHandler {
             console.error("Error fetching data: ", e);
         }
     }
+
     // CREATE
     async addData(userData: UserInfo) {
         try {
-            await addDoc(collection(this.db, AUTHENTICATION_COLLECTION), userData);
+            const docRef = doc(this.db, AUTHENTICATION_COLLECTION, userData.uid);
+            await setDoc(docRef, userData);
         } catch (e) {
             throw new Error("Error adding document: " + e);
         }
     }
-    // DESTROY
-    async deleteData(id: string) {
-        try {
-            const docRef = doc(this.db, AUTHENTICATION_COLLECTION, id);
-            await deleteDoc(docRef);
-        } catch (e) {
-            throw new Error("Error deleting document: " + e);
-        }
-    }
+
     // UPDATE
     async updateData(id: string, updatedData: Partial<UserInfo>) {
         try {
@@ -63,6 +75,8 @@ export class UserDataHandler {
             throw new Error("Error updating document: " + e);
         }
     }
+
+
     public async authenticate(req : any, res : any, next : any) {
         
         try {
