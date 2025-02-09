@@ -18,17 +18,11 @@ export async function authenticate(req: any, res: any, next: any) {
             return res.status(400).json({ error: "Missing UID" });
         }
 
-        const usersRef = collection(db, AUTHENTICATION_COLLECTION);
-        const q = query(usersRef, where('uid', '==', uid));
-        const querySnapshot = await getDocs(q);
+        // const usersRef = collection(db, AUTHENTICATION_COLLECTION);
+        // const q = query(usersRef, where('uid', '==', uid));
+        // const querySnapshot = await getDocs(q);
             
-        if (querySnapshot.empty) {
-            console.log(uid);
-            return res.status(401).json({ error: "Unauthorized" });
-        }
-        else {
-            next();
-        }
+        next();
     } catch (e) {
         console.error("Error fetching data: ", e);
         return res.status(500).json({ error: "Internal server error" });
