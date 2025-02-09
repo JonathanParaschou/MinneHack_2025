@@ -3,11 +3,32 @@ import { TouchableOpacity, View, Text, Image } from 'react-native';
 import { signInWithGoogle } from "../utils/firebase";
 import styles from "../style/google-button";
 
+  
 export default function Index() {
+   
     const handlePress = async () => {
         try {
-            await signInWithGoogle();
-        }
+            const userCredential = await signInWithGoogle();
+            const idToken = userCredential?.credential?.idToken;
+
+            if (idToken) {
+                // Send the ID token to the backend
+                const response = await fetch('http://local-host:80/api/authentication', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ token: idToken }), // Sending the token as JSON
+                });
+
+                if (response.ok) {
+                    // Handle successful login
+                    console.log('User successfully authenticated with backend!');
+                } else {
+                    console.log('Error authenticating with backend');
+                }
+            }
+        } 
         catch {
             console.log('uh oh!');
         }
