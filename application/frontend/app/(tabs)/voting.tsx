@@ -36,10 +36,12 @@ const VotingScreen = () => {
       console.log(data);
 
       const contestResponse = await fetch('http://localhost:8080/api/contests');
-      const contestData = (await contestResponse.json())[0];
+      const contestData = await contestResponse.json();
+
+      console.log(contestData);
 
       const contestSubmissions = data.filter((submission: any) => (submission.contestId && submission.contestId === contestData.id));
-      console.log(data);
+      console.log(contestSubmissions);
     }
     load();
   });

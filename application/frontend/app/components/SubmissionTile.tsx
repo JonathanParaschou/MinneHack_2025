@@ -31,6 +31,7 @@ const SubmissionTile = ({ submission }: { submission: Submission }) => {
   }
 
   useEffect(() => {
+    console.log(submission);
     const fetchSvg = async () => {
       try {
         const response = await fetch(photoURL);
@@ -99,7 +100,8 @@ const SubmissionTile = ({ submission }: { submission: Submission }) => {
       <Text style={styles.timeText}>{makePostedString(submittedAt)}</Text>
 
       <View style={styles.actions}>
-        <TouchableOpacity style={styles.button}>
+        <TouchableOpacity style={styles.button} 
+        onPress={() => router.push('/comments?submissionId=' + (submission.id || ''))}>
           <Text style={styles.buttonText}>Comment</Text>
         </TouchableOpacity>
       </View>
