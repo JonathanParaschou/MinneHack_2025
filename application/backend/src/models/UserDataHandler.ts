@@ -1,9 +1,9 @@
 // Import necessary Firebase services
 import { FirebaseApp, initializeApp } from "firebase/app";
-import { getFirestore, collection, getDocs, addDoc, Firestore, deleteDoc, doc, updateDoc, query, where } from "firebase/firestore";
+import { getFirestore, collection, getDocs, addDoc, Firestore, deleteDoc, doc, updateDoc, query, where, DocumentData } from "firebase/firestore";
 import { firebaseConfig } from "../constants/firebaseConstants";
 import { AUTHENTICATION_COLLECTION } from "../constants/firebaseConstants";
-import { SubmissionInfo } from "interfaces/ISubmissionInfo";
+import { UserInfo } from "interfaces/IUserInfo";
 
 export class UserDataHandler {
     app: FirebaseApp | undefined;
@@ -23,15 +23,20 @@ export class UserDataHandler {
             const usersRef = collection(this.db, AUTHENTICATION_COLLECTION)
             const q = query(usersRef, where('uid', '==', uid));
             const querySnapshot = await getDocs(collection(this.db, AUTHENTICATION_COLLECTION));
+            let ret: UserInfo[] = [];
             
+            querySnapshot.forEach((docSnapshot: DocumentData) => {
+                ret.push(docSnapshot.data() as UserInfo);
+            });
             if (querySnapshot.empty) {
-                return res.status(404).json({ message: 'User not found' });
+                return ret;
             }
 
             let userData;
             querySnapshot.forEach(doc => {
                 userData = { id: doc.id, ...doc.data() }; // Assuming only one result
             });
+            return ret;
 
         } catch (e) {
             console.error("Error fetching data: ", e);
@@ -39,9 +44,9 @@ export class UserDataHandler {
     }
 
     // CREATE
-    async addData(submissionData: SubmissionInfo) {
+    async addData(userData: UserInfo) {
         try {
-            await addDoc(collection(this.db, AUTHENTICATION_COLLECTION), submissionData);
+            await addDoc(collection(this.db, AUTHENTICATION_COLLECTION), userData);
         } catch (e) {
             throw new Error("Error adding document: " + e);
         }
@@ -58,7 +63,7 @@ export class UserDataHandler {
     }
 
     // UPDATE
-    async updateData(id: string, updatedData: Partial<SubmissionInfo>) {
+    async updateData(id: string, updatedData: Partial<UserInfo>) {
         try {
             const docRef = doc(this.db, AUTHENTICATION_COLLECTION, id);
 
@@ -69,7 +74,8 @@ export class UserDataHandler {
         }
     }
 
-    public static async authenticate(req, res, next) {
+    public async authenticate(req : any, res : any, next : any) {
+        
         try {
             console.log(req);
             console.log(res);
@@ -79,8 +85,8 @@ export class UserDataHandler {
             }
     
             // Query Firestore to check if the API key exists
-            const keysRef = collection(this.db, 'api_keys'); // Change 'api_keys' to your actual collection name
-            const q = query(keysRef, where('key', '==', apikey));
+            const keysRef = collection(this.db, AUTHENTICATION_COLLECTION); 
+            const q = query(keysRef, where('apiKey', '==', apikey));
             const querySnapshot = await getDocs(q);
     
             if (querySnapshot.empty) {
