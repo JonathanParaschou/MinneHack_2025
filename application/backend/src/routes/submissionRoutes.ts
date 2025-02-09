@@ -2,15 +2,16 @@
 
 import express from 'express';
 import { SubmissionDataHandler } from '../models/SubmissionDataHandler';
+import { authenticate } from '../authMiddleware';
 
 // CRUD operations for submissions
 const router = express.Router();
 const db = new SubmissionDataHandler();
 
 // Fetching all submission data
-router.get('/', async (req, res) => {
+router.get('/', authenticate, async (req, res) => {
     try {
-        const submissions = await db.fetchData();
+        const submissions = await db.fetchData(req.headers["authorization"] as string);
         res.status(200).json(submissions);
     } catch (err: any) {
         res.status(500).json({ error: err.message });
@@ -18,7 +19,7 @@ router.get('/', async (req, res) => {
 });
 
 // Create a new submission
-router.post('/', async (req, res) => {
+router.post('/', authenticate, async (req, res) => {
     try {
         await db.addData(req.body);
         res.status(201).json();
@@ -28,7 +29,7 @@ router.post('/', async (req, res) => {
 });
 
 // Update an existing submission
-router.put('/:id', async (req, res) => {
+router.put('/:id', authenticate, async (req, res) => {
     try {
         await db.updateData(req.params.id, req.body);
         res.status(200).json();
@@ -52,7 +53,7 @@ router.put('/rating/:id', async (req, res) => {
 });
 
 // Delete an existing Submission
-router.delete('/:id', async (req, res) => {
+router.delete('/:id', authenticate, async (req, res) => {
     try {
         await db.deleteData(req.params.id);
         res.status(200).json();
@@ -62,7 +63,7 @@ router.delete('/:id', async (req, res) => {
 });
 
 // Fetch all submissions based on creator ID
-router.get('/creator/:creatorIds', async (req, res) => {
+router.get('/creator/:creatorIds', authenticate, async (req, res) => {
     try {
         const submissions = await db.fetchSubmissionDataByCreatorIds([req.params.creatorIds]);
         res.status(200).json(submissions);
@@ -72,7 +73,7 @@ router.get('/creator/:creatorIds', async (req, res) => {
 });
 
 // Fetch submission by ID
-router.get('/:id', async (req, res) => {
+router.get('/:id', authenticate, async (req, res) => {
     try {
         const submission = await db.fetchSubmissionDataById(req.params.id);
         res.status(200).json(submission);

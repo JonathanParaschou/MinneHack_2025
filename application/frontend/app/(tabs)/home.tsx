@@ -16,7 +16,7 @@ export default function Index() {
 
   useEffect(() => {
     const auth = getAuth();
-    
+
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       if (!user) {
         router.push('/login'); // Redirect to login if not authenticated
@@ -33,9 +33,10 @@ export default function Index() {
         setUserHasDrawn(promptData.uids.includes(user.uid));
 
         // Fetch submissions
-        const submissionsResponse = await fetch('http://localhost:8080/api/submissions');
-        const submissionsData = await submissionsResponse.json();
-        console.log(submissionsData);
+        // const submissionsResponse = await fetch('http://localhost:8080/api/submissions');
+        // const submissionsData = await submissionsResponse.json();
+        const res = await fetchWithUid(`http://localhost:8080/api/submissions`, {}, user.uid);
+        const submissionsData = await res.json();
         setSubmissions(submissionsData);
       } catch (error) {
         console.error("Error fetching data:", error);
