@@ -13,16 +13,22 @@ interface UserInfo {
     friendRequests: string[];
 }
 
+const players = [
+    { name: 'Peter', image: '' },
+    { name: 'Jonathan', image: '' },
+    { name: 'Yash', image: '' }
+];
+
 export default function ContestEnded() {
     return (
         <View style={styles.container}>
             <Header></Header>
             <View style={styles.bodyContainer}>
                 <Text style={styles.title}>Contest has ended!</Text>
-                <Text style={styles.subTitle}>Voting Results:</Text>
+                <Text style={styles.subtitle}>Voting Results:</Text>
             </View>
-            {/* <Podium></Podium> */}
-=            <Footer></Footer>
+            <Podium players={players}></Podium>
+            <Footer></Footer>
         </View>
     );
 }
@@ -47,7 +53,6 @@ const styles = StyleSheet.create({
         width: '85%',
         marginLeft: 'auto',
         marginRight: 'auto',
-        marginTop: -40
     },
     title: {
         fontSize: 25,

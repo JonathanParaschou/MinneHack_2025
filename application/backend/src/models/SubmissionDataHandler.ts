@@ -111,7 +111,7 @@ export class SubmissionDataHandler {
             } else {
                 const data = docSnap.data();
                 data.votes = data.votes ? data.votes + 1 : 1;
-                data.rating = data.rating ? (data.rating + parseInt(stars)) / data.votes : stars;
+                data.rating = data.rating ? (data.rating + parseInt(stars)) : stars;
                 await updateDoc(docRef, data);
             }
             console.log(`Document with ID ${id} updated.`);

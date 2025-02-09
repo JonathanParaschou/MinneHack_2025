@@ -62,7 +62,6 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#121212',
     padding: 20,
   },
   podiumContainer: {
@@ -102,7 +101,7 @@ const styles = StyleSheet.create({
   },
   name: {
     color: '#fff',
-    fontSize: 25,
+    fontSize: 20,
     marginTop: 10,
     paddingBottom: 5,
     fontWeight: 'bold'

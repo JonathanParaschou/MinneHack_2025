@@ -15,43 +15,61 @@ const VotingScreen = () => {
   const [svgWidth, setSvgWidth] = useState<number>(0);
   const [svgHeight, setSvgHeight] = useState<number>(0);
   const [contestData, setContestData] = useState([]);
+  const [contest, setContest] = useState({});
+  const [loading, setLoading] = useState(true);
   const router = useRouter();
 
   const handleVote = (rating: any) => {
-    const id = (contestData[index] as any).submissionId;
-    fetchWithUid(`http://localhost:8080/api/submissions/rating/${id}`, {
+    // const id = (contestData[index] as any).submissionId;
+    fetchWithUid(`http://localhost:8080/api/submissions/rating/77QTobWAnLWNEZApb8Qe`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ value: rating }),
     }, (user as any).uid);
-    fetchNewImage();
+    router.push('/contestEnded');
+    // fetchNewImage();
   };
-
-  const fetchNewImage = () => {
-    // if (index === contestData.length - 1) {
-    //   router.push('/results');
-    // }
-    setIndex((index + 1));
-
-    fetchSvg();
-  };
-
-  const fetchSvg = async () => {
+  
+  async function fetchSvg(data: any) {
     try {
-      console.log(contestData);
-      const response = await fetch((contestData[index] as any).photoURL);
+      const response = await fetch("https://firebasestorage.googleapis.com/v0/b/drawit-25b8c.firebasestorage.app/o/drawings%2F1739123024744.svg?alt=media&token=a6043f8e-c707-48e0-b196-d38eb7ff5b0f"
+);
       const svgText = await response.text();
       setSvgContent(svgText);
 
       // Extract width and height from the SVG viewBox
-      const match = svgText.match(/viewBox="0 0 (\d+) (\d+)"/);
-      if (match) {
-        const [_, width, height] = match;
-        setSvgWidth(parseInt(width, 10));
-        setSvgHeight(parseInt(height, 10));
-      }
+      // const match = svgText.match(/viewBox="0 0 (\d+) (\d+)"/);
+      // if (match) {
+      //   const [_, width, height] = match;
+      //   setSvgWidth(parseInt(width, 10));
+      //   setSvgHeight(parseInt(height, 10));
+      // }
     } catch (error) {
       console.error('Error fetching SVG:', error);
+      throw error;
+    }
+  };
+
+  const fetchNewImage = () => {
+    console.log(`index is ${index}`);
+    console.log(contestData)
+    if (index == 0) {
+      try {
+        fetchSvg(contestData[index + 1]);
+      }
+      catch (e) {
+        router.push('/contestEnded');
+      }
+      setIndex(1);
+      return;
+    }
+    else if (index == contestData.length) {
+      router.push('/contestEnded');
+      return;
+    }
+    else {
+      setIndex(index + 1);
+      fetchSvg(contestData[index]);
     }
   };
 
@@ -63,17 +81,26 @@ const VotingScreen = () => {
         return;
       }
 
+      setLoading(true);
+      console.log('fetching data');
       const response = await fetchWithUid('http://localhost:8080/api/submissions/', {}, (user as any).uid);
       const data = await response.json();
+
       console.log(data);
-
       setContestData(data);
-
 
       const contestResponse = await fetch('http://localhost:8080/api/contests');
       const contestDataTemp = await contestResponse.json();
 
-      fetchSvg();
+      setContest(contestDataTemp);
+
+      // try {
+        fetchSvg(data[index]);
+      // }
+      // catch {
+      //   router.push('/contestEnded');
+      // }
+      setLoading(false);
       //use this later
       // const contestSubmissions = data.filter((submission: any) => (submission.contestId && submission.contestId === contestData.id));
     }
@@ -103,6 +130,11 @@ const VotingScreen = () => {
         <ScrollView style={styles.container}>
           <View style={styles.content}>
               <Text style={styles.voteText}>Vote on the Drawings!</Text>
+              <Text style={styles.subTitle}>Prompt was: {(contest as any).prompt}</Text>
+                {/* {loading ? 
+                  <Text style={styles.timeText}>Loading...</Text> :
+                  null 
+                  } */}
                 {svgContent ? (
                   <SvgXml xml={svgContent} style={styles.image} width={svgWidthAdjusted} height={svgHeightAdjusted} />
                 ) : (
@@ -124,6 +156,15 @@ const VotingScreen = () => {
 };
 
 const styles = StyleSheet.create({
+  subTitle: {
+    fontSize: 15,
+    textAlign: 'center',
+    color: 'white',
+    marginBottom: 50,
+    width: '85%',
+    marginLeft: 'auto',
+    marginRight: 'auto',
+  },
   voteText: {
     fontSize: 24,
     color: '#ffffff',
@@ -200,6 +241,12 @@ const styles = StyleSheet.create({
   buttonText: {
     fontSize: 18,
     color: '#ffffff',
+  },
+  timeText: {
+    fontSize: 14,
+    color: '#777',
+    marginBottom: 10,
+    marginTop: 5
   },
 });
 

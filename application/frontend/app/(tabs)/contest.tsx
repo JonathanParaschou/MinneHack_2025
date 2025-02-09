@@ -50,6 +50,8 @@ const ContestScreen = () => {
             }
             else {
                 setContestFlag('ended');
+                router.push('/contestEnded');
+                return;
             }
 
             //check time and update accordingly
@@ -70,6 +72,8 @@ const ContestScreen = () => {
                 }
                 else {
                     setContestFlag('ended');
+                    router.push('/contestEnded');
+                    clearInterval(interval);
                 }
             }, 1000);
 

@@ -20,9 +20,9 @@ export default function User() {
     const router = useRouter();
 
     const players = [
-        { name: '1', image: '' },
-        { name: '3', image: '' },
-        { name: '5', image: '' }
+        { name: '1 1st', image: '' },
+        { name: '0 2nd', image: '' },
+        { name: '1 3rd', image: '' }
     ];
 
     function handleUsernameChange() {
