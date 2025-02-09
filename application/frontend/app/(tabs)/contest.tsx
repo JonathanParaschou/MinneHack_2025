@@ -1,17 +1,18 @@
 import React from 'react';
 import { View, Text, Image, StyleSheet, Dimensions } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import { useRouter } from 'expo-router'; // Use expo-router's useRouter for navigation
 import Timer from '../components/ContestTimer'; // Import the Timer component
+import { useRouter } from 'expo-router';
 
 const { width } = Dimensions.get('window'); // Get the window width for responsive styling
 
 const ContestScreen = () => {
-  const navigation = useNavigation();
+  const router = useRouter(); // Using useRouter for navigation
   const contestStartTime = new Date('2025-02-10T00:00:00'); // Example contest start time
   const timeRemaining = contestStartTime - new Date();
 
   const handleTimeEnd = () => {
-    navigation.navigate('RatingScreen'); // Navigate to RatingScreen when time is up
+    router.push('/voting'); // Navigate to /rating when time is up
   };
 
   return (
