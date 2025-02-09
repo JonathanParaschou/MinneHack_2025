@@ -9,7 +9,7 @@ const Podium = ({ players }) => {
       <View style={styles.podiumContainer}>
 
         {/* 2nd Place (Medium Height) */}
-        <View style={[styles.podiumItem, { height: height * 0.3 }]}>
+        <View style={[styles.podiumItem, { height: height * 0.25 }]}>
             <View style={styles.medalContainer}>
                 <Image
                     source={{ uri: 'https://cdn-icons-png.flaticon.com/128/179/179251.png' }}  // Placeholder for 2nd place medal
@@ -24,7 +24,7 @@ const Podium = ({ players }) => {
         </View>
 
         {/* 1st Place (Tallest) */}
-        <View style={[styles.podiumItem, { height: height * 0.36 }]}>
+        <View style={[styles.podiumItem, { height: height * 0.3 }]}>
             <View style={styles.medalContainer}>
                 <Image
                     source={{ uri: 'https://cdn-icons-png.flaticon.com/128/179/179249.png' }}  // Placeholder for 1st place medal
@@ -39,7 +39,7 @@ const Podium = ({ players }) => {
         </View>
 
         {/* 3rd Place (Shortest) */}
-        <View style={[styles.podiumItem, { height: height * 0.25 }]}>
+        <View style={[styles.podiumItem, { height: height * 0.2 }]}>
             <View style={styles.medalContainer}>
                 <Image
                     source={{ uri: 'https://cdn-icons-png.flaticon.com/128/179/179250.png' }}  // Placeholder for 3rd place medal
@@ -70,7 +70,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-around',
     alignItems: 'flex-end',
     width: width - 40,
-    height: height * 0.5,
+    height: height * 0.4,
   },
   podiumItem: {
     alignItems: 'center',

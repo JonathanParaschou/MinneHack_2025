@@ -29,6 +29,8 @@ const styles = StyleSheet.create({
     // position: 'fixed',
     // bottom: 0,
     width: '100%',
+    borderTopColor: "#444", // Lighter border color
+    borderTopWidth: 1,
   },
   button: {
     padding: 10,

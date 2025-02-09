@@ -1,10 +1,16 @@
 import React from 'react';
-import { View, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet } from 'react-native';
+import Header from '../components/Header';
 
 
 const FriendsComponent = () => {
   return (
-    'friends'
+    <View>
+      <Header></Header>
+      <Text>
+        hello!
+      </Text>
+    </View>
   );
 };
 

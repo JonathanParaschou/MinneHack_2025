@@ -18,7 +18,7 @@ const ContestScreen = () => {
     <View style={styles.container}>
       <View style={styles.header}>
         <Image
-          source={require('../images/user-friends.png')} // Convert your SVG to PNG or use a library like react-native-svg
+          // source={require('../images/user-friends.png')} // Convert your SVG to PNG or use a library like react-native-svg
           style={styles.friends}
         />
         <Text style={styles.title}>DrawIt.</Text>
