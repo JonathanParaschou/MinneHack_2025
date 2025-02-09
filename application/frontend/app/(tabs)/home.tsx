@@ -1,13 +1,27 @@
-import { ScrollView, Text, View, Image, Dimensions, Button, TouchableOpacity } from "react-native";
-import { StyleSheet } from "react-native";
-import SubmissionTile from "../components/SubmissionTile";
+import { ScrollView, Text, View, TouchableOpacity, StyleSheet } from "react-native";
+import { useState, useEffect } from "react"; // Import useState and useEffect
 import { useRouter } from 'expo-router';
 import Footer from "../components/Footer";
-
-const { width, height } = Dimensions.get("window");
+import SubmissionTile from "../components/SubmissionTile";
 
 export default function Index() {
   const router = useRouter();
+  const [submissions, setSubmissions] = useState([]); // State to hold fetched submission data
+
+  // Fetch data on component mount
+  useEffect(() => {
+    const fetchSubmissions = async () => {
+      try {
+        const response = await fetch('http://localhost:5000/api/submissions'); // Replace with actual API URL
+        const data = await response.json();
+        setSubmissions(data); // Set the fetched data to the state
+      } catch (error) {
+        console.error("Error fetching submissions:", error);
+      }
+    };
+
+    fetchSubmissions();
+  }, []); // Empty dependency array to run only once after component mounts
 
   return (
     <View style={styles.container}>
@@ -25,10 +39,14 @@ export default function Index() {
         <TouchableOpacity style={styles.button} onPress={() => router.push('/(tabs)/draw')}>
           <Text style={styles.buttonText}>Post</Text>
         </TouchableOpacity>
-        <SubmissionTile />
-        <SubmissionTile />
-        <SubmissionTile />
-        <SubmissionTile />
+
+        {submissions.length > 0 ? (
+          submissions.map((submission, index) => (
+            <SubmissionTile key={index} submission={submission} /> // Pass each submission as a prop
+          ))
+        ) : (
+          <Text style={styles.noDataText}>No submissions available</Text>
+        )}
       </ScrollView>
       <Footer />
     </View>
@@ -58,17 +76,6 @@ const styles = StyleSheet.create({
     paddingTop: 60, // Ensure content starts below the fixed header
     paddingBottom: 20,
   },
-  friends: {
-    width: width * 0.08,
-    height: width * 0.08,
-  },
-  title: {
-    fontSize: 30,
-    fontWeight: "bold",
-    flex: 1,
-    textAlign: "center",
-    color: "#ffffff", // White text for dark mode
-  },
   button: {
     backgroundColor: '#FFF',
     paddingVertical: 8,
@@ -79,12 +86,19 @@ const styles = StyleSheet.create({
     color: '#GGG',
     fontWeight: 'bold',
   },
-  actions: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-  },
   text: {
     color: 'white'
-  }
+  },
+  title: {
+    fontSize: 30,
+    fontWeight: "bold",
+    flex: 1,
+    textAlign: "center",
+    color: "#ffffff", // White text for dark mode
+  },
+  noDataText: {
+    color: 'white',
+    textAlign: 'center',
+    marginTop: 20,
+  },
 });
-

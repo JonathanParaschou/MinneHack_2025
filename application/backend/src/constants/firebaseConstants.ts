@@ -8,5 +8,5 @@ export const firebaseConfig = {
   appId: "1:887264139761:web:c285bbf327dc1377a50c50"
 };
 
-export const AUTHENITCAION_COLLECTION = "users";
+export const AUTHENTICATION_COLLECTION = "users";
 export const SUBMISSION_COLLECTION = "submissions";
