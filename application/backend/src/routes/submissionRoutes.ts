@@ -2,6 +2,7 @@
 
 import express from 'express';
 import { SubmissionDataHandler } from '../models/SubmissionDataHandler';
+import { UserDataHandler } from '../models/UserDataHandler';
 
 const router = express.Router();
 const db = new SubmissionDataHandler();
@@ -17,7 +18,7 @@ router.post('/', async (req, res) => {
 });
 
 // READ
-router.get('/', async (req, res) => {
+router.get('/', UserDataHandler.authenticate ,async (req, res) => {
     try {
         await db.fetchData();
         res.status(200).json(res);
